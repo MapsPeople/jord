@@ -1,7 +1,6 @@
-# !/usr/bin/env python3
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 
-__author__ = "Christian Heider Nielsen"
+__author__ = "Christian Heider Lindbjerg"
 __doc__ = r"""
 
            Created on 02-12-2020
@@ -9,6 +8,7 @@ __doc__ = r"""
 
 from typing import Any, Optional, Tuple
 
+# noinspection PyUnresolvedReferences
 from qgis.PyQt import QtCore
 
 __all__ = ["MyTableModel"]
@@ -28,6 +28,7 @@ class MyTableModel(QtCore.QAbstractTableModel):
         super().__init__(parent)
         self.data = data
 
+    # noinspection PyMethodMayBeStatic
     def headerData(
         self, section: int, orientation: QtCore.Qt.Orientation, role: int
     ) -> str:  # Do not rename

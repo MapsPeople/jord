@@ -1,5 +1,5 @@
+#mistune==0.8.4
+furo
 sphinx>=4.0.1
 #m2r2
 sphinxcontrib-programoutput
-#mistune==0.8.4
-furo

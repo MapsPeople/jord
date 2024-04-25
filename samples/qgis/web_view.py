@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-__author__ = "Christian Heider Nielsen"
+__author__ = "Christian Heider Lindbjerg"
 __doc__ = r"""
 
            Created on 02-12-2020
@@ -45,7 +44,7 @@ def get_web_view(parent: Any) -> QWebView:
             </script>
             <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD-9tCzsZ0-ZgK_ZgXZ-_XzQ_XzQ_XzQ_X&callback=initMap"
             async defer></script>
-            </html> 
+            </html>
             """
 
     # self.my_web_view.loadHtml(self.html_template)

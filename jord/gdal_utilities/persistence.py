@@ -1,11 +1,13 @@
+#!/usr/bin/env python3
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 from typing import Type, Union
 
 import shapely
-from jord.gdal_utilities.spatial_reference import get_spatial_reference_from_epsg
 from osgeo import ogr
+
+from jord.gdal_utilities.spatial_reference import get_spatial_reference_from_epsg
 
 __all__ = [
     "create_ogr_table",

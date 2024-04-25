@@ -1,10 +1,9 @@
+#!/usr/bin/env python3
 from typing import Dict
 
 from geopandas import GeoDataFrame
 
-
 from jord.shapely_utilities import ShapelyGeometryTypesEnum
-
 
 __all__ = ["split_on_geom_type"]
 
@@ -23,5 +22,6 @@ def split_on_geom_type(
     gdf3 = gdf[gdf.geometry.type=="MultiPolygon"]
     """
     return {
-        t: data_frame[data_frame.geom_type == t.value] for t in ShapelyGeometryTypesEnum
+        t: data_frame[data_frame.geom_type == t.value.__name__]
+        for t in ShapelyGeometryTypesEnum
     }

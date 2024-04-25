@@ -1,7 +1,6 @@
-# !/usr/bin/env python3
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 
-__author__ = "Christian Heider Nielsen"
+__author__ = "Christian Heider Lindbjerg"
 __doc__ = r"""
 
            Created on 02-12-2020
@@ -9,12 +8,9 @@ __doc__ = r"""
 
 from typing import Any
 
-from PyQt5.QtCore import (
-    QSettings,
-)
-
 __all__ = ["add_settings"]
 
+# noinspection PyUnresolvedReferences
 from qgis.core import QgsProject, QgsSettings, QgsVectorLayer
 
 
@@ -68,7 +64,7 @@ def vector_layer_settings(name: str) -> None:
 
 def add_settings(settings, key: str, value: Any) -> None:
     if settings is None:
-        settings = QSettings()
+        settings = QgsSettings()
     settings.beginGroup("PostgreSQL/connections")
     # self.cmb_db_connections.addItem('------------')
     # self.cmb_db_connections.addItems(settings.childGroups())

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-__author__ = "Christian Heider Nielsen"
+__author__ = "Christian Heider Lindbjerg"
 
 from warg import ensure_in_sys_path, find_nearest_ancestral_relative
 
@@ -16,14 +15,14 @@ def test_import_package():
 
 
 def test_qgis_import_package():
-    if False:
+    if True:
         from jord import qgis_utilities
 
         print(qgis_utilities.__doc__)
 
 
 def test_gdal_import_package():
-    if True:
+    if False:
         from jord import gdal_utilities
 
         print(gdal_utilities.__doc__)
@@ -86,8 +85,8 @@ def test_rasterio_import_package():
 
 
 def test_torch_import_package():
-    if True:
-        from jord import torch_utilities
+    if False:
+        from jord.exclude import torch_utilities
 
         print(torch_utilities.__doc__)
 
@@ -99,3 +98,4 @@ if __name__ == "__main__":
     test_import_package()
     test_shapely_import_package()
     test_rasterio_import_package()
+    test_qgis_import_package()

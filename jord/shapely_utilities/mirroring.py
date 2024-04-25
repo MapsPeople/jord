@@ -1,30 +1,42 @@
+#!/usr/bin/env python3
+
 __all__ = ["reflection"]
 
-import numpy
+from numbers import Number
+from typing import Callable
+
+from shapely.affinity import scale
+from shapely.geometry import Polygon
+from shapely.ops import transform
+
 
 # pts = numpy.array([[0, 0], [1, 1], [1, 2], [0, 1]])
 # display(Polygon(pts.dot([[1,0],[0,-1]])))
 
 
-def principal_axis():
-    ...
+def principal_axis(): ...
 
 
-from shapely.affinity import scale
-from shapely.ops import transform
-from shapely.geometry import Polygon
+def reflection(x0: Number) -> Callable:
+    """
 
-
-def reflection(x0):
+    :param x0:
+    :return:
+    """
     return lambda x, y: (2 * x0 - x, y)
 
 
-P = Polygon([[0, 0], [1, 1], [1, 2], [0, 1]])
-print(P)  # POLYGON ((0 0, 1 1, 1 2, 0 1, 0 0))
+if __name__ == "__main__":
 
-Q1 = scale(P, xfact=-1, origin=(1, 0))  # X-axis
-# scale(P, yfact = -1, origin = (1, 0)) # Y-axis
-Q2 = transform(reflection(1), P)
+    def ausdhuashd():
+        P = Polygon([[0, 0], [1, 1], [1, 2], [0, 1]])
+        print(P)  # POLYGON ((0 0, 1 1, 1 2, 0 1, 0 0))
 
-print(Q1)  # POLYGON ((2 0, 1 1, 1 2, 2 1, 2 0))
-print(Q2)  # POLYGON ((2 0, 1 1, 1 2, 2 1, 2 0))
+        Q1 = scale(P, xfact=-1, origin=(1, 0))  # X-axis
+        # scale(P, yfact = -1, origin = (1, 0)) # Y-axis
+        Q2 = transform(reflection(1), P)
+
+        print(Q1)  # POLYGON ((2 0, 1 1, 1 2, 2 1, 2 0))
+        print(Q2)  # POLYGON ((2 0, 1 1, 1 2, 2 1, 2 0))
+
+    ausdhuashd()

@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-__author__ = "Christian Heider Nielsen"
+__author__ = "Christian Heider Lindbjerg"
 __doc__ = r"""
 
            Created on 02-12-2020
            """
 
+from typing import Any
+
 import numpy
 from qgis.PyQt import QtGui
 from qgis.PyQt.QtCore import QEvent, Qt
 from qgis.gui import QgsPixmapLabel
-from typing import Any
+
 from .conversion import get_qimage_from_numpy
 
 __all__ = ["NumpyImageWidget"]

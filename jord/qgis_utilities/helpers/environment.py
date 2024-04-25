@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-__author__ = "Christian Heider Nielsen"
+__author__ = "Christian Heider Lindbjerg"
 __doc__ = r"""
 
            Created on 02-12-2020
@@ -68,7 +67,7 @@ def get_requirement_version(requirement_name: str) -> Optional[str]:
     return None
 
 
-def get_installed_version(requirement_name: str) -> str:
+def get_installed_version(requirement_name: str) -> Optional[str]:
     import pkg_resources
 
     try:

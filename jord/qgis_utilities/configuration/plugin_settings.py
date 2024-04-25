@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-__author__ = "Christian Heider Nielsen"
+__author__ = "Christian Heider Lindbjerg"
 __doc__ = r"""
 
            Created on 02-12-2020
@@ -11,12 +10,12 @@ __all__ = ["store_plugin_setting", "read_plugin_setting"]
 
 from typing import Any
 
-from qgis.core import QgsSettings
-
 from jord import PROJECT_NAME
 
 
-def store_plugin_setting(key: str, value: Any, *, project_name: str = PROJECT_NAME):
+def store_plugin_setting(
+    key: str, value: Any, *, project_name: str = PROJECT_NAME
+) -> None:
     """
 
     :param key:
@@ -24,12 +23,15 @@ def store_plugin_setting(key: str, value: Any, *, project_name: str = PROJECT_NA
     :param project_name:
     :return:
     """
+    # noinspection PyUnresolvedReferences
+    from qgis.core import QgsSettings
+
     QgsSettings().setValue(f"{project_name}/{key}", value)
 
 
 def read_plugin_setting(
     key: str, *, default_value: Any = None, project_name: str = PROJECT_NAME
-):
+) -> Any:
     """
 
     :param key:
@@ -37,6 +39,9 @@ def read_plugin_setting(
     :param project_name:
     :return:
     """
+    # noinspection PyUnresolvedReferences
+    from qgis.core import QgsSettings
+
     return QgsSettings().value(f"{project_name}/{key}", default_value)
 
 

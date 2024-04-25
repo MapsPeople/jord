@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import re
 from pathlib import Path
 from typing import List, Sequence, Union
@@ -7,7 +6,7 @@ from typing import List, Sequence, Union
 from setuptools import find_packages, setup
 
 
-def python_version_check(major: int = 3, minor: int = 7) -> None:
+def python_version_check(major: int = 3, minor: int = 8) -> None:
     """
       :param major:
     :param minor:
@@ -69,7 +68,7 @@ def read_reqs(file: str, path: Path) -> List[str]:
     return list(req_set)
 
 
-with open(Path(__file__).parent / "jord" / "__init__.py", "r") as project_init_file:
+with open(Path(__file__).parent / "jord" / "__init__.py") as project_init_file:
     str_reg_exp = "['\"]([^'\"]*)['\"]"
     content = project_init_file.read()  # get strings from module
     version = re.search(rf"__version__ = {str_reg_exp}", content, re.M).group(1)
@@ -164,7 +163,7 @@ class JordPackage:
         Returns:
 
         """
-        return "christian.heider@alexandra.dk"
+        return "chen@mapspeople.dk"
 
     @property
     def maintainer_name(self) -> str:
@@ -350,42 +349,42 @@ if __name__ == "__main__":
     )
 
     """
-    name: str = ...,
-          version: str = ...,
-          description: str = ...,
-          long_description: str = ...,
-          author: str = ...,
-          author_email: str = ...,
-          maintainer: str = ...,
-          maintainer_email: str = ...,
-          url: str = ...,
-          download_url: str = ...,
-          packages: list[str] = ...,
-          py_modules: list[str] = ...,
-          scripts: list[str] = ...,
-          ext_modules: list[Extension] = ...,
-          classifiers: list[str] = ...,
-          distclass: Type[Distribution] = ...,
-          script_name: str = ...,
-          script_args: list[str] = ...,
-          options: Mapping[str, Any] = ...,
-          license: str = ...,
-          keywords: list[str] | str = ...,
-          platforms: list[str] | str = ...,
-          cmdclass: Mapping[str, Type[Command]] = ...,
-          data_files: list[tuple[str, list[str]]] = ...,
-          package_dir: Mapping[str, str] = ...,
-          obsoletes: list[str] = ...,
-          provides: list[str] = ...,
-          requires: list[str] = ...,
-          command_packages: list[str] = ...,
-          command_options: Mapping[str, Mapping[str, tuple[Any, Any]]] = ...,
-          package_data: Mapping[str, list[str]] = ...,
-          include_package_data: bool = ...,
-          libraries: list[str] = ...,
-          headers: list[str] = ...,
-          ext_package: str = ...,
-          include_dirs: list[str] = ...,
-          password: str = ...,
-          fullname: str = ...,
-    """
+  name: str = ...,
+        version: str = ...,
+        description: str = ...,
+        long_description: str = ...,
+        author: str = ...,
+        author_email: str = ...,
+        maintainer: str = ...,
+        maintainer_email: str = ...,
+        url: str = ...,
+        download_url: str = ...,
+        packages: list[str] = ...,
+        py_modules: list[str] = ...,
+        scripts: list[str] = ...,
+        ext_modules: list[Extension] = ...,
+        classifiers: list[str] = ...,
+        distclass: Type[Distribution] = ...,
+        script_name: str = ...,
+        script_args: list[str] = ...,
+        options: Mapping[str, Any] = ...,
+        license: str = ...,
+        keywords: list[str] | str = ...,
+        platforms: list[str] | str = ...,
+        cmdclass: Mapping[str, Type[Command]] = ...,
+        data_files: list[tuple[str, list[str]]] = ...,
+        package_dir: Mapping[str, str] = ...,
+        obsoletes: list[str] = ...,
+        provides: list[str] = ...,
+        requires: list[str] = ...,
+        command_packages: list[str] = ...,
+        command_options: Mapping[str, Mapping[str, tuple[Any, Any]]] = ...,
+        package_data: Mapping[str, list[str]] = ...,
+        include_package_data: bool = ...,
+        libraries: list[str] = ...,
+        headers: list[str] = ...,
+        ext_package: str = ...,
+        include_dirs: list[str] = ...,
+        password: str = ...,
+        fullname: str = ...,
+  """

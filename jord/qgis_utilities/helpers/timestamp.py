@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-__author__ = "Christian Heider Nielsen"
+__author__ = "Christian Heider Lindbjerg"
 __doc__ = r"""
 
            Created on 02-12-2020
@@ -10,7 +9,10 @@ __doc__ = r"""
 import time
 from typing import Any
 
+# noinspection PyUnresolvedReferences
 from qgis.PyQt import QtGui
+
+# noinspection PyUnresolvedReferences
 from qgis.PyQt.QtCore import Qt
 
 __all__ = ["qt_draw_timestamp"]

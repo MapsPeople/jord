@@ -1,15 +1,21 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-__author__ = "Christian Heider Nielsen"
+__author__ = "Christian Heider Lindbjerg"
 __doc__ = r"""
 
            Created on 02-12-2020
            """
 
+# noinspection PyUnresolvedReferences
 from qgis.PyQt import QtGui
+
+# noinspection PyUnresolvedReferences
 from qgis.PyQt.QtCore import Qt
+
+# noinspection PyUnresolvedReferences
 from qgis.core import QgsWkbTypes
+
+# noinspection PyUnresolvedReferences
 from qgis.gui import QgsMapCanvas, QgsRubberBand
 
 __all__ = ["make_rubber_band"]

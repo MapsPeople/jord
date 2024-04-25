@@ -1,2 +1,1 @@
 # Vector Geometry Representation
-

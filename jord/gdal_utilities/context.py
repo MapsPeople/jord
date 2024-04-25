@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 __author__ = "heider"
 __doc__ = r"""
@@ -20,8 +19,7 @@ class SilenceGDALSession(AlsoDecorator):
     TODO: add support for having a lasting side effect or leaving last set state of error/exception handling
     """
 
-    def __init__(self):
-        ...
+    def __init__(self): ...
 
     def __enter__(self) -> bool:
         GDAL.PushErrorHandler(

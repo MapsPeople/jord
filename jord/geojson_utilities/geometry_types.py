@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from enum import Enum
 
 from geojson import (
@@ -9,7 +10,6 @@ from geojson import (
     MultiPolygon,
     GeometryCollection,
 )
-
 
 __all__ = ["GeoJsonGeometryTypesEnum"]
 
@@ -32,3 +32,7 @@ class GeoJsonGeometryTypesEnum(Enum):
     multi_polygon = MultiPolygon  #
 
     geometry_collection = GeometryCollection  #
+
+
+if __name__ == "__main__":
+    print(GeoJsonGeometryTypesEnum.geometry_collection.value.__name__)

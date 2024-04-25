@@ -1,17 +1,21 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-__author__ = "Christian Heider Nielsen"
+__author__ = "Christian Heider Lindbjerg"
 __doc__ = r"""
 
            Created on 02-12-2020
            """
 
+import logging
 from typing import Sequence
 
 import numpy
 from PIL import Image
+
+# noinspection PyUnresolvedReferences
 from qgis.PyQt import QtGui
+
+# noinspection PyUnresolvedReferences
 from qgis.core import (
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform,
@@ -46,7 +50,7 @@ def get_qimage_from_numpy(img: Image, debug: bool = False) -> QtGui.QImage:
     height, width, channels = img.shape
 
     if debug:
-        print(f"height: {height}, width: {width}, channels: {channels}")
+        logging.info(f"height: {height}, width: {width}, channels: {channels}")
 
     bytes_per_line = channels * width
     img = numpy.require(img, numpy.uint8, "C")
@@ -96,11 +100,11 @@ def get_coordinates_of_layer_extent(layer: QgsVectorLayer) -> list:
 
     """
 
-    layerRectangle = layer.extent()
+    layer_rectangle = layer.extent()
 
     return [
-        layerRectangle.xMinimum(),
-        layerRectangle.yMinimum(),
-        layerRectangle.xMaximum(),
-        layerRectangle.yMaximum(),
+        layer_rectangle.xMinimum(),
+        layer_rectangle.yMinimum(),
+        layer_rectangle.xMaximum(),
+        layer_rectangle.yMaximum(),
     ]

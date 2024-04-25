@@ -1,9 +1,11 @@
+#!/usr/bin/env python3
+
 from typing import Any
 
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QAction, QWidget
-from jord.qgis_utilities.helpers.signals import reconnect_signal
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QAction, QWidget
 
+from jord.qgis_utilities.helpers.signals import reconnect_signal
 
 __all__ = ["create_action"]
 

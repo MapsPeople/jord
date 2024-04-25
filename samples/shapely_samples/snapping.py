@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+from shapely import LineString, Polygon
 from shapely.ops import snap
 
 square = Polygon([(1, 1), (2, 1), (2, 2), (1, 2), (1, 1)])

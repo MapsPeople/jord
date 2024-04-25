@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 __author__ = "heider"
 __doc__ = r"""
@@ -9,17 +8,19 @@ __doc__ = r"""
 
 from pathlib import Path
 
-with open(Path(__file__).parent / "README.md", "r") as this_init_file:
+with open(Path(__file__).parent / "README.md") as this_init_file:
     __doc__ += this_init_file.read()
 
-from .analysis import *
 from .clamp import *
 from .lines import *
 from .morphology import *
 from .points import *
-from .sanitise_poly import *
-from .serialisation import *
+from .polygons import *
 from .geometry_types import *
-from .iteration import *
 from .projection import *
 from .transformation import *
+from .rings import *
+from .selection import *
+from .grouping import *
+from .mirroring import *
+from .selection import *

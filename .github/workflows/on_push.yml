@@ -6,7 +6,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [ 3.8 ]
+        python-version: [3.8]
     steps:
       - uses: actions/checkout@master
       - name: Set up Python 3.8
@@ -20,4 +20,3 @@ jobs:
           pip install -r requirements/requirements_dev.txt
           pip install -r requirements/requirements_docs.txt
       - uses: pything/postdoc@master
-

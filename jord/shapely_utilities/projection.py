@@ -1,12 +1,17 @@
-from typing import Sequence, Tuple
+#!/usr/bin/env python3
+from typing import Sequence, Tuple, Optional
 
+import numpy
 from shapely.geometry import Polygon, Point, LineString
 from shapely.geometry.base import BaseGeometry
+from warg import pairs, Number
 
-from jord.shapely_utilities import pairs
-
-
-__all__ = ["project_point_to_object", "project_point_to_line", "nearest_geometry"]
+__all__ = [
+    "project_point_to_object",
+    "project_point_to_line_points",
+    "project_point_to_line",
+    "nearest_geometry",
+]
 
 
 def project_point_to_object(point: Point, geometry: BaseGeometry) -> Point:
@@ -25,7 +30,9 @@ def project_point_to_object(point: Point, geometry: BaseGeometry) -> Point:
             line_start = Point(seg_start)
             line_end = Point(seg_end)
 
-            intersection_point = project_point_to_line(point, line_start, line_end)
+            intersection_point = project_point_to_line_points(
+                point, line_start, line_end
+            )
             cur_dist = point.distance(intersection_point)
 
             if cur_dist < min_dist:
@@ -37,7 +44,9 @@ def project_point_to_object(point: Point, geometry: BaseGeometry) -> Point:
             line_start = Point(seg_start)
             line_end = Point(seg_end)
 
-            intersection_point = project_point_to_line(point, line_start, line_end)
+            intersection_point = project_point_to_line_points(
+                point, line_start, line_end
+            )
             cur_dist = point.distance(intersection_point)
 
             if cur_dist < min_dist:
@@ -53,19 +62,22 @@ def project_point_to_object(point: Point, geometry: BaseGeometry) -> Point:
     return nearest_point
 
 
-def project_point_to_line(point: Point, line_start: Point, line_end: Point) -> Point:
+def project_point_to_line_points(
+    point: Point, line_start: Point, line_end: Point, must_be_orthogonal: bool = False
+) -> Point:
     """Find the nearest point on a straight line, measured from given point.
 
     Source: http://gis.stackexchange.com/a/438/19627
 
+    :param must_be_orthogonal:
     :param point: a shapely Point object
     :param line_start: the line starting point as a shapely Point
     :param line_end: the line end point as a shapely Point
 
     :return: a shapely Point that lies on the straight line closest to point
 
-
     """
+
     line_magnitude = line_start.distance(line_end)
 
     u = (
@@ -75,19 +87,77 @@ def project_point_to_line(point: Point, line_start: Point, line_end: Point) -> P
 
     # closest point does not fall within the line segment,
     # take the shorter distance to an endpoint
+
     if u < 0.00001 or u > 1:
         ix = point.distance(line_start)
         iy = point.distance(line_end)
 
         if ix > iy:
+            if must_be_orthogonal:
+                raise Exception
             return line_end
 
         else:
+            if must_be_orthogonal:
+                raise Exception()
             return line_start
 
     ix = line_start.x + u * (line_end.x - line_start.x)
     iy = line_start.y + u * (line_end.y - line_start.y)
+
     return Point([ix, iy])
+
+
+def project_point_to_line(point: Point, line: LineString) -> Point:
+    line_coords = line.coords
+
+    # assert line_coords == 2
+
+    return project_point_to_line_points(point, *[Point(*xy) for xy in line_coords])
+
+
+def line_line_intersection(line: LineString, other: LineString) -> Optional[Point]:
+    """
+
+    p = p1_start
+    r = (p1_end - p1_start)
+
+    q = p2_start
+    s = (p2_end - p2_start)
+
+    t = numpy.cross(q - p, s) / (numpy.cross(r, s))
+
+    # This is the intersection point
+    i = p + t * r
+
+    :param line:
+    :param other:
+    :return:
+    """
+
+    import sympy.geometry
+
+    l1 = sympy.geometry.Line(*[sympy.geometry.Point(*xy) for xy in line.coords])
+
+    l2 = sympy.geometry.Line(*[sympy.geometry.Point(*xy) for xy in other.coords])
+
+    l1_l2_intersection = l1.intersection(
+        l2
+    )  # These are two infinite lines defined by two points on the line
+
+    if len(l1_l2_intersection) == 1:
+        if isinstance(l1_l2_intersection[0], sympy.geometry.Line2D):  # Same
+            return
+        return Point(*l1_l2_intersection[0])
+
+
+def get_intersection_linear_functions(
+    a1: Number, b1: Number, a2: Number, b2: Number
+) -> Tuple[Number, Number]:
+    A = numpy.array([[-a1, 1], [-a2, 1]])
+    b = numpy.array([[b1], [b2]])
+    # you have to solve linear System AX = b where X = [x y]'
+    return numpy.squeeze(numpy.linalg.pinv(A) @ b)  # x,y
 
 
 def nearest_geometry(
@@ -105,3 +175,26 @@ def nearest_geometry(
     )
 
     return geometries[min_index], min_dist, min_index
+
+
+if __name__ == "__main__":
+    print(
+        line_line_intersection(
+            LineString([[0, 0], [1, 1]]), LineString([[1, 0], [0, 1]])
+        )
+    )
+    print(
+        line_line_intersection(
+            LineString([[0, 0], [1, 1]]), LineString([[6, 0], [5, 1]])
+        )
+    )
+    print(
+        line_line_intersection(
+            LineString([[0, 0], [1, 1]]), LineString([[0, 0], [1, 1]])
+        )
+    )
+    print(
+        line_line_intersection(
+            LineString([[0, 0], [1, 1]]), LineString([[1, 0], [2, 1]])
+        )
+    )

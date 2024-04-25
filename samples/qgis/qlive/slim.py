@@ -1,13 +1,15 @@
-import zmq
+#!/usr/bin/env python3
 import numpy
-from jord.qlive_utilities.serialisation import build_package
+import zmq
+
 from jord.qlive_utilities.procedures import QliveRPCMethodEnum
+from jord.qlive_utilities.serialisation import build_package
 
 context = zmq.Context()
 
 socket = context.socket(zmq.REQ)
 
-socket.connect("tcp://localhost:5556")
+socket.connect("tcp://localhost:5555")
 
 DEFAULT_CRS = "EPSG:3857"  # "EPSG:4326"
 crs = DEFAULT_CRS
@@ -22,7 +24,6 @@ example_wkt_gm = (
     "GEOMETRYCOLLECTION(POINT(0 0), LINESTRING(0 0, 1440 900), POLYGON((0 0, 0 1024, 1024 1024, "
     "1024 0, 0 0)))"
 )
-
 
 if False:
     socket.send(build_package(QliveRPCMethodEnum.add_wkt, example_wkt_polygon))

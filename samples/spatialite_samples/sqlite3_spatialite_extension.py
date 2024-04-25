@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import sqlite3
 
 # from pysqlite2 import dbapi2 as sqlite3

@@ -1,5 +1,8 @@
-numpy>=1.20.2
-warg>=1.1.6
 apppath>=1.0.2
-sorcery
-pyzmq
+draugr>=1.0.9
+numpy>=1.20.0
+pyzmq>=1.1.1
+sorcery>=0.2.0
+sympy>=1.1.1
+tqdm>=1.1.1
+warg>=1.1.6

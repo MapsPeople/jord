@@ -1,9 +1,16 @@
-import zmq
+#!/usr/bin/env python3
 import numpy
+from geopandas import GeoDataFrame, GeoSeries
+from pandas import DataFrame
 
+from jord.qlive_utilities import build_package
 from jord.qlive_utilities.client import QliveClient
-from jord.qlive_utilities.serialisation import build_package
-from jord.qlive_utilities.procedures import QliveRPCMethodEnum
+from jord.qlive_utilities.procedures import QliveRPCMethodEnum, QliveRPCMethodMap
+
+build_package
+numpy
+QliveRPCMethodMap
+QliveRPCMethodEnum
 
 DEFAULT_CRS = "EPSG:3857"  # "EPSG:4326"
 crs = DEFAULT_CRS
@@ -19,7 +26,7 @@ example_wkt_gm = (
     "1024 0, 0 0)))"
 )
 
-with QliveClient("tcp://localhost:5556") as qlive:
+with QliveClient("tcp://localhost:5555") as qlive:
     if False:
         from PIL import Image
 
@@ -62,9 +69,6 @@ with QliveClient("tcp://localhost:5556") as qlive:
         )
 
     if True:
-        from geopandas import GeoDataFrame, GeoSeries
-        from pandas import DataFrame
-
         df = DataFrame(
             {
                 "City": ["Buenos Aires", "Brasilia", "Santiago", "Bogota", "Caracas"],
@@ -79,14 +83,16 @@ with QliveClient("tcp://localhost:5556") as qlive:
                 ],
             }
         )
-        from shapely import wkt
 
         df["Coordinates"] = GeoSeries.from_wkt(df["Coordinates"])
         data_frame = GeoDataFrame(df, geometry="Coordinates")
 
-        qlive.send(
-            build_package(
-                QliveRPCMethodEnum.add_dataframe,
-                data_frame,
+        if False:
+            qlive.send(
+                build_package(
+                    QliveRPCMethodEnum.add_dataframe,
+                    data_frame,
+                )
             )
-        )
+        else:
+            qlive.add_dataframe(data_frame)

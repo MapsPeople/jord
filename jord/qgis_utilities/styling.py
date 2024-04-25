@@ -1,18 +1,18 @@
+#!/usr/bin/env python3
+
+import logging
 from typing import Mapping
 
-from PyQt5.QtGui import QColor
-from warg import TripleNumber
-import random
-from itertools import cycle
-from typing import Any, Iterable, Sized
+# noinspection PyUnresolvedReferences
+from qgis.PyQt.QtGui import QColor
 
-from PyQt5.Qt import QColor
+# noinspection PyUnresolvedReferences
 from qgis.core import (
-    QgsVectorLayer,
-    QgsSymbol,
-    QgsRendererCategory,
     QgsCategorizedSymbolRenderer,
     QgsLineSymbol,
+    QgsRendererCategory,
+    QgsSymbol,
+    QgsVectorLayer,
 )
 from warg import TripleNumber
 
@@ -34,13 +34,14 @@ def style_layer_from_mapping(
         cat_color = default_color
         cat_opacity = default_opacity
         cat_width = default_width
+        label = str(cat)
 
         if cat in style_mapping.keys():
-            style = style_mapping[cat]
+            style = style_mapping[label]
             if "color" in style:
                 cat_color = (
                     int(n) for n in style["color"]
-                )  #  TODO: also support with AlphaChannel | Qt.GlobalColor | QGradient
+                )  # TODO: also support with AlphaChannel | Qt.GlobalColor | QGradient
             if "opacity" in style:
                 cat_opacity = max(0.0, min(float(style["opacity"]), 1.0))
             if "width" in style:
@@ -53,10 +54,10 @@ def style_layer_from_mapping(
         if isinstance(symbol, QgsLineSymbol):
             symbol.setWidth(cat_width)
         else:
-            print(f"width ignored, symbol is of type: {type(symbol)}")
+            logging(f"width ignored, symbol is of type: {type(symbol)}")
 
         render_categories.append(
-            QgsRendererCategory(cat, symbol=symbol, label=cat, render=True)
+            QgsRendererCategory(cat, symbol=symbol, label=label, render=True)
         )
 
     layer.setRenderer(QgsCategorizedSymbolRenderer(field_name, render_categories))

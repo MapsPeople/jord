@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-__author__ = "Christian Heider Nielsen"
+
+from logging import warning
+from typing import Optional
+
+# noinspection PyUnresolvedReferences
+from qgis.PyQt import QtCore
+
+__author__ = "Christian Heider Lindbjerg"
 __doc__ = r"""
 
            Created on 02-12-2020
@@ -9,14 +15,12 @@ __doc__ = r"""
 
 __all__ = ["disconnect_signal", "connect_signal", "reconnect_signal"]
 
-from logging import warning
-
-from qgis.PyQt import QtCore
-
 IS_DEBUGGING = False
 
 
-def connect_signal(signal: QtCore.pyqtSignal, new_handler: callable = None) -> None:
+def connect_signal(
+    signal: QtCore.pyqtSignal, new_handler: Optional[callable] = None
+) -> None:
     """
 
     :param signal:
@@ -31,7 +35,9 @@ def connect_signal(signal: QtCore.pyqtSignal, new_handler: callable = None) -> N
         warning("new_handler is None")
 
 
-def disconnect_signal(signal: QtCore.pyqtSignal, old_handler: callable = None) -> None:
+def disconnect_signal(
+    signal: QtCore.pyqtSignal, old_handler: Optional[callable] = None
+) -> None:
     """
 
     :param signal:
@@ -55,17 +61,17 @@ def disconnect_signal(signal: QtCore.pyqtSignal, old_handler: callable = None) -
 
 def reconnect_signal(
     signal: QtCore.pyqtSignal,
-    new_handler: callable = None,
-    old_handler: callable = None,
+    new_handler: Optional[callable] = None,
+    old_handler: Optional[callable] = None,
 ) -> None:
     """
 
     :param signal:
     :type signal: QtCore.pyqtSignal
     :param new_handler:
-    :type new_handler: callable
+    :type new_handler: Optional[callable]
     :param old_handler:
-    :type old_handler: callable
+    :type old_handler: Optional[callable]
     :return:
     :rtype: None
     """

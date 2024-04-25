@@ -8,8 +8,8 @@
 
 <!--# Jord-->
 
-| [![Build Status](https://travis-ci.org/aivclab/jord.svg?branch=master)](https://travis-ci.org/aivclab/jord) | [![Coverage Status](https://coveralls.io/repos/github/aivclab/vision/badge.svg?branch=master)](https://coveralls.io/github/aivclab/vision?branch=master) | [![GitHub Issues](https://img.shields.io/github/issues/aivclab/vision.svg?style=flat)](https://github.com/aivclab/vision/issues) | [![GitHub Forks](https://img.shields.io/github/forks/aivclab/vision.svg?style=flat)](https://github.com/aivclab/vision/network) | [![GitHub Stars](https://img.shields.io/github/stars/aivclab/vision.svg?style=flat)](https://github.com/aivclab/vision/stargazers) | [![GitHub License](https://img.shields.io/github/license/aivclab/vision.svg?style=flat)](https://github.com/aivclab/vision/blob/master/LICENSE.md) |
-|-------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| [![Build Status](https://travis-ci.org/automaps/jord.svg?branch=master)](https://travis-ci.org/automaps/jord) | [![Coverage Status](https://coveralls.io/repos/github/automaps/jord/badge.svg?branch=master)](https://coveralls.io/github/automaps/jord?branch=master) | [![GitHub Issues](https://img.shields.io/github/issues/automaps/jord.svg?style=flat)](https://github.com/automaps/jord/issues) | [![GitHub Forks](https://img.shields.io/github/forks/automaps/jord.svg?style=flat)](https://github.com/automaps/jord/network) | [![GitHub Stars](https://img.shields.io/github/stars/automaps/jord.svg?style=flat)](https://github.com/automaps/jord/stargazers) | [![GitHub License](https://img.shields.io/github/license/automaps/jord.svg?style=flat)](https://github.com/automaps/jord/blob/master/LICENSE.md) |
+|---------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
 
 <p align="center" width="100%">
   <a href="https://www.python.org/">
@@ -30,5 +30,5 @@
 
 # Authors
 
-* **Christian Heider Nielsen** - [cnheider](https://github.com/cnheider)
-* [Other contributors](https://github.com/aivclab/jord/contributors)
+* **Christian Heider Lindbjerg** - [cnheider](https://github.com/cnheider)
+* [Other contributors](https://github.com/automaps/jord/contributors)
