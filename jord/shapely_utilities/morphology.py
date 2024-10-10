@@ -25,8 +25,9 @@ from warg import passes_kws_to
 
 from .uniformity import ensure_cw_poly
 
-FALLBACK_CAPSTYLE = shapely.BufferCapStyle.round  # CAN BE OVERRIDDEN
-FALLBACK_JOINSTYLE = shapely.BufferCapStyle.round  # CAN BE OVERRIDDEN
+FALLBACK_LINESTRING_CAPSTYLE = shapely.BufferCapStyle.square  # CAN BE OVERRIDDEN
+FALLBACK_POINT_CAPSTYLE = shapely.BufferCapStyle.round  # CAN BE OVERRIDDEN
+FALLBACK_POINT_JOINSTYLE = shapely.BufferCapStyle.round  # CAN BE OVERRIDDEN
 DEFAULT_DISTANCE = 1e-7
 
 logger = logging.getLogger(__name__)
@@ -78,10 +79,13 @@ def morphology_buffer(
                 geom = geom_
 
     if (
-        isinstance(geom, shapely.Point) and cap_style == shapely.BufferCapStyle.flat
-    ):  # parameter NONSENSE, probably not what is intended
-        cap_style = FALLBACK_CAPSTYLE
-        join_style = FALLBACK_JOINSTYLE
+        cap_style == shapely.BufferCapStyle.flat
+    ):  # test for parameter NONSENSE, probably not what was intended
+        if isinstance(geom, (shapely.Point, shapely.MultiPoint)):
+            cap_style = FALLBACK_POINT_CAPSTYLE
+            join_style = FALLBACK_POINT_JOINSTYLE
+        elif isinstance(geom, (shapely.LineString, shapely.MultiLineString)):
+            cap_style = FALLBACK_LINESTRING_CAPSTYLE
 
     res = geom.buffer(
         distance=distance, cap_style=cap_style, join_style=join_style, **kwargs

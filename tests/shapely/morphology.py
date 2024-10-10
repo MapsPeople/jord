@@ -54,6 +54,22 @@ def test_operation_zero(operation, shape):
             ),
             None,
         ),
+        (
+            shapely.LineString(
+                (
+                    (0.8544427077864901, 0.2981250003092),
+                    (0.85444270778649, 0.2981250003092),
+                )
+                # 'LINESTRING (0.8544427077864901 0.2981250003092, 0.85444270778649 0.2981250003092)'
+            ),
+            None,
+            # 'POLYGON ((
+            # 0.85444270778649 0.2981240003092,
+            # 0.85444270778649 0.2981260003092,
+            # 0.8544427077864901 0.2981240003092,
+            # 0.85444270778649 0.2981240003092
+            # ))'
+        ),
     ],
 )
 def test_dilate_no_area_shape(
@@ -61,6 +77,7 @@ def test_dilate_no_area_shape(
 ):
     a = dilate(p)
     assert not a.is_empty, a
+    assert isinstance(a, shapely.Polygon)
     assert a.area > 0
     assert a.minimum_clearance > 0, a.minimum_clearance
     assert a != p
