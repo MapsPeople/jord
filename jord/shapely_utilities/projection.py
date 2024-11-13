@@ -1,17 +1,28 @@
 #!/usr/bin/env python3
-from typing import Sequence, Tuple, Optional
+from typing import Iterable, Optional, Sequence, Tuple, Union
 
 import numpy
-from shapely.geometry import Polygon, Point, LineString
+import shapely
+from shapely import LinearRing, MultiLineString
+from shapely.geometry import LineString, Point, Polygon
 from shapely.geometry.base import BaseGeometry
-from warg import pairs, Number
+from warg import Number, pairs
+
+from jord.shapely_utilities.morphology import dilate
 
 __all__ = [
     "project_point_to_object",
     "project_point_to_line_points",
     "project_point_to_line",
     "nearest_geometry",
+    "make_projected_ring",
+    "make_extruded_ring",
+    "get_min_max_projected_line",
+    "line_line_intersection",
+    "SingularExtentGeometry",
 ]
+
+SingularExtentGeometry = Union[shapely.LineString, shapely.LinearRing, shapely.Polygon]
 
 
 def project_point_to_object(point: Point, geometry: BaseGeometry) -> Point:
@@ -168,7 +179,8 @@ def nearest_geometry(
     :param geometries: a list of shapely geometry objects
     :param point: a shapely Point
 
-    :return:        Tuple (geom, min_dist, min_index) of the geometry with minimum distance        to point, its distance min_dist and the list index of geom, so that        geom = geometries[min_index].
+    :return:        Tuple (geom, min_dist, min_index) of the geometry with minimum distance        to point,
+    its distance min_dist and the list index of geom, so that        geom = geometries[min_index].
     """
     min_dist, min_index = min(
         (point.distance(geom), k) for (k, geom) in enumerate(geometries)
@@ -177,24 +189,195 @@ def nearest_geometry(
     return geometries[min_index], min_dist, min_index
 
 
+def get_min_max_projected_line(
+    geom: SingularExtentGeometry, other: shapely.geometry.base.BaseGeometry
+) -> shapely.LineString:
+    if not isinstance(geom, shapely.LineString):
+        geom = geom.boundary
+
+    if isinstance(other, shapely.MultiLineString):
+        geom = geom.boundary
+
+    min_v = max_v = 0.5
+
+    other_coords = other.boundary.coords
+
+    # Find limits
+    for point_coords in other_coords:
+        v = geom.project(Point(point_coords), normalized=True)
+        if v < min_v:
+            min_v = v
+        elif v > max_v:
+            max_v = v
+        else:
+            ...
+
+    # Reconstruct line within limit
+    vs = []
+    for point_coords in geom.coords:
+        p = Point(point_coords)
+        d = geom.project(p, normalized=True)
+        if max_v > d > min_v:
+            vs.append(d)
+        else:
+            ...
+
+    # translate distances to points
+    coords = []
+    for d in [min_v, *sorted(vs), max_v]:
+        a = geom.interpolate(d, normalized=True)
+        coords.append(a)
+
+    return LineString(coords)
+
+
+def make_projected_ring(
+    lines: Union[MultiLineString, Iterable[LineString]], ccw: bool = True
+) -> LinearRing:
+    points = []
+
+    if isinstance(lines, MultiLineString):
+        lines = lines.geoms
+
+    num_lines = len(lines)
+
+    if ccw:
+        lines = lines[::-1]
+
+    for n in range(num_lines):
+        points.append(project_point_to_line(Point(lines[n - 1].coords[-1]), lines[n]))
+
+    ring = LinearRing(points)
+
+    assert ring.is_closed
+    assert ring.is_ring
+
+    return ring
+
+
+def make_extruded_ring(
+    lines: Union[MultiLineString, Iterable[LineString]], ccw: bool = True
+) -> LinearRing:
+    points = []
+
+    if isinstance(lines, MultiLineString):
+        lines = lines.geoms
+
+    num_lines = len(lines)
+
+    if ccw:
+        lines = lines[::-1]
+
+    for n in range(num_lines):
+        points.append(Point(line_line_intersection(lines[n - 1], lines[n]).coords[-1]))
+
+    ring = LinearRing(points)
+
+    assert ring.is_closed
+    assert ring.is_ring
+
+    return ring
+
+
 if __name__ == "__main__":
-    print(
-        line_line_intersection(
-            LineString([[0, 0], [1, 1]]), LineString([[1, 0], [0, 1]])
+
+    def uihasuih():
+        print(
+            line_line_intersection(
+                LineString([[0, 0], [1, 1]]), LineString([[1, 0], [0, 1]])
+            )
         )
-    )
-    print(
-        line_line_intersection(
-            LineString([[0, 0], [1, 1]]), LineString([[6, 0], [5, 1]])
+        print(
+            line_line_intersection(
+                LineString([[0, 0], [1, 1]]), LineString([[6, 0], [5, 1]])
+            )
         )
-    )
-    print(
-        line_line_intersection(
-            LineString([[0, 0], [1, 1]]), LineString([[0, 0], [1, 1]])
+        print(
+            line_line_intersection(
+                LineString([[0, 0], [1, 1]]), LineString([[0, 0], [1, 1]])
+            )
         )
-    )
-    print(
-        line_line_intersection(
-            LineString([[0, 0], [1, 1]]), LineString([[1, 0], [2, 1]])
+        print(
+            line_line_intersection(
+                LineString([[0, 0], [1, 1]]), LineString([[1, 0], [2, 1]])
+            )
         )
-    )
+
+    def uijhas():
+        line = LineString([[0, 0], [1, 1], [2, 0], [1, -1]])
+        poly = dilate(Point((1, 0)), distance=0.4)
+        print(line)
+        print(poly)
+        print(get_min_max_projected_line(line, poly).wkt)
+
+    def juijh():
+        r"""
+
+            0   1   2
+
+        0   0---0   0
+                    |
+        1   0       0
+            |
+        2   0   0---0
+
+        to become
+
+
+            0   1   2
+
+        0   0---0---0
+            |       |
+        1   0       0
+            |       |
+        2   0---0---0
+
+        :return:
+        """
+
+        lines = [
+            LineString([[0, 0], [1, 0]]),
+            LineString([[2, 0], [2, 1]]),
+            LineString([[2, 2], [1, 2]]),
+            LineString([[0, 2], [0, 1]]),
+        ]
+
+        print(make_extruded_ring(lines))
+
+    def juijh2():
+        r"""
+
+            0   1   2   3
+
+        0   0---0---0---0
+                    |
+        1   0       0
+            |
+        2   0   0---0
+
+        to become
+
+
+            0   1   2
+
+        0   0---0---0
+            |       |
+        1   0       0
+            |       |
+        2   0---0---0
+
+        :return:
+        """
+
+        lines = [
+            LineString([[0, 0], [3, 0]]),
+            LineString([[2, 0], [2, 1]]),
+            LineString([[2, 2], [1, 2]]),
+            LineString([[0, 2], [0, 1]]),
+        ]
+
+        print(make_extruded_ring(lines))
+
+    # juijh2()
+
+    uijhas()

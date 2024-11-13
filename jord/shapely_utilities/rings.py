@@ -1,17 +1,13 @@
 #!/usr/bin/env python3
+import shapely
 
-from typing import Iterable, Union
+from shapely import LinearRing
+from shapely.geometry import LineString, MultiLineString, Point, Polygon
+from shapely.ops import linemerge
 
-from shapely import LineString, LinearRing, MultiLineString, Point
+__all__ = ["ensure_ccw_ring", "ensure_cw_ring", "split_ring"]
 
-from .projection import line_line_intersection, project_point_to_line
-
-__all__ = [
-    "ensure_ccw_ring",
-    "ensure_cw_ring",
-    "make_projected_ring",
-    "make_extruded_ring",
-]
+from typing import Union
 
 
 def ensure_ccw_ring(ring: LinearRing) -> LinearRing:
@@ -26,122 +22,87 @@ def ensure_cw_ring(ring: LinearRing) -> LinearRing:
     return ring
 
 
-def make_projected_ring(
-    lines: Union[MultiLineString, Iterable[LineString]], ccw: bool = True
-) -> LinearRing:
-    points = []
+def split_ring(
+    ring: LinearRing,
+    split: Union[LinearRing, LineString, MultiLineString, shapely.GeometryCollection],
+):
+    """Split a linear ring geometry, returns a [Multi]LineString
 
-    if isinstance(lines, MultiLineString):
-        lines = lines.geoms
+    See my PostGIS function on scigen named ST_SplitRing
+    """
+    valid_types = ("MultiLineString", "LineString", "GeometryCollection")
+    if not hasattr(ring, "geom_type"):
+        raise ValueError("expected ring as a geometry")
+    elif not hasattr(split, "geom_type"):
+        raise ValueError("expected split as a geometry")
+    if ring.geom_type == "LinearRing":
+        ring = LineString(ring)
+    if ring.geom_type != "LineString":
+        raise ValueError(
+            "ring is not a LinearRing or LineString, found " + str(ring.geom_type)
+        )
+    elif not ring.is_closed:
+        raise ValueError("ring is not closed")
+    elif split.is_empty:
+        return ring
+    elif not split.intersects(ring):
+        # split does not intersect ring
+        return ring
+    if split.geom_type == "LinearRing":
+        split = LineString(split)
+    if split.geom_type not in valid_types:
+        raise ValueError(
+            "split is not a LineString-like or GeometryCollection geometry, "
+            "found " + str(split.geom_type)
+        )
 
-    num_lines = len(lines)
+    intersections = ring.intersection(split)
+    if intersections.is_empty:
+        # no intersections, returning same ring
+        return ring
+    elif intersections.geom_type == "Point":
+        # Simple case, where there is only one line intersecting the ring
+        result = Polygon(ring).difference(split).exterior
+        # If it is a coordinate of the ring, then the ring needs to be rotated
+        coords = result.coords[:-1]
+        found_i = 0
+        for i, c in enumerate(coords):
+            if Point(c).almost_equals(intersections):
+                found_i = i
+                break
+        if found_i > 0:
+            result = Polygon(coords[i:] + coords[:i]).exterior
+        if result.interpolate(0).distance(intersections) > 0:
+            raise Exception(
+                "result start point %s to intersection %s is %s"
+                % (result.interpolate(0), intersections, result.distance(intersections))
+            )
+        elif result.geom_type != "LinearRing":
+            raise Exception("result is not a LinearRing, found " + result.geom_type)
+        elif not result.is_closed:
+            raise Exception("result is not closed")
+        return LineString(result)
 
-    if ccw:
-        lines = lines[::-1]
+    difference = ring.difference(split)
+    if difference.geom_type != "MultiLineString":
+        raise ValueError(
+            "expected MultiLineString difference, found " + difference.geom_type
+        )
 
-    for n in range(num_lines):
-        points.append(project_point_to_line(Point(lines[n - 1].coords[-1]), lines[n]))
+    start_point = ring.interpolate(0)
+    if start_point.distance(intersections) == 0:
+        # special case: start point is the same as an intersection
+        return difference
 
-    ring = LinearRing(points)
-
-    assert ring.is_closed
-    assert ring.is_ring
-
-    return ring
-
-
-def make_extruded_ring(
-    lines: Union[MultiLineString, Iterable[LineString]], ccw: bool = True
-) -> LinearRing:
-    points = []
-
-    if isinstance(lines, MultiLineString):
-        lines = lines.geoms
-
-    num_lines = len(lines)
-
-    if ccw:
-        lines = lines[::-1]
-
-    for n in range(num_lines):
-        points.append(Point(line_line_intersection(lines[n - 1], lines[n]).coords[-1]))
-
-    ring = LinearRing(points)
-
-    assert ring.is_closed
-    assert ring.is_ring
-
-    return ring
-
-
-if __name__ == "__main__":
-
-    def juijh():
-        r"""
-
-            0   1   2
-
-        0   0---0   0
-                    |
-        1   0       0
-            |
-        2   0   0---0
-
-        to become
-
-
-            0   1   2
-
-        0   0---0---0
-            |       |
-        1   0       0
-            |       |
-        2   0---0---0
-
-        :return:
-        """
-
-        lines = [
-            LineString([[0, 0], [1, 0]]),
-            LineString([[2, 0], [2, 1]]),
-            LineString([[2, 2], [1, 2]]),
-            LineString([[0, 2], [0, 1]]),
-        ]
-
-        print(make_extruded_ring(lines))
-
-    def juijh2():
-        r"""
-
-            0   1   2   3
-
-        0   0---0---0---0
-                    |
-        1   0       0
-            |
-        2   0   0---0
-
-        to become
-
-
-            0   1   2
-
-        0   0---0---0
-            |       |
-        1   0       0
-            |       |
-        2   0---0---0
-
-        :return:
-        """
-
-        lines = [
-            LineString([[0, 0], [3, 0]]),
-            LineString([[2, 0], [2, 1]]),
-            LineString([[2, 2], [1, 2]]),
-            LineString([[0, 2], [0, 1]]),
-        ]
-
-        print(make_extruded_ring(lines))
-
-    juijh2()
+    # Otherwise the line where the close meets needs to be fused
+    fuse = []
+    parts = list(difference.geoms)
+    for ipart, part in enumerate(parts):
+        if part.intersects(start_point):
+            fuse.append(ipart)
+    if len(fuse) != 2:
+        raise ValueError("expected 2 geometries, found " + str(len(fuse)))
+    # glue the last to the first
+    popped_part = parts.pop(fuse[1])
+    parts[fuse[0]] = linemerge([parts[fuse[0]], popped_part])
+    return MultiLineString(parts)

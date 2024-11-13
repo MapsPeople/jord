@@ -34,6 +34,8 @@ __all__ = [
     "bend_towards",
     "remove_redundant_nodes",
     "split_line",
+    "internal_points",
+    "snap_endings_to_points",
 ]
 
 import collections
@@ -42,6 +44,7 @@ from enum import Enum
 from typing import Iterable, List, Sequence, Tuple, Union
 
 import numpy
+import shapely
 from shapely.geometry import (
     LineString,
     LinearRing,
@@ -50,9 +53,7 @@ from shapely.geometry import (
     Point,
     box,
 )
-import shapely
 from shapely.geometry.base import BaseGeometry
-from shapely.ops import linemerge as shapely_linemerge
 
 # from sorcery import assigned_names
 from warg import Number, pairs
@@ -157,6 +158,9 @@ def to_lines(
     else:
         raise NotImplementedError(f"{geoms, type(geoms)}")
 
+    if not isinstance(lines, List):
+        lines = list(lines)
+
     return lines
 
 
@@ -233,7 +237,33 @@ def line_endpoints(lines: Union[List[LineString], MultiLineString]) -> MultiPoin
         item for item, count in collections.Counter(all_points).items() if count < 2
     }  # Remove duplicates
 
-    return MultiPoint([Point(p) for p in endpoints])
+    return shapely.MultiPoint([Point(p) for p in endpoints])
+
+
+def internal_points(
+    lines: Union[List[LineString], MultiLineString]
+) -> shapely.MultiPoint:
+    """
+
+    :param lines:
+    :type: Union[List[LineString], MultiLineString]
+    :return: Returns a MultiPoint of terminal points from list of LineStrings.
+    :rtype: MultiPoint
+    """
+
+    all_points = []
+    if isinstance(lines, MultiLineString):
+        lines = lines.geoms
+
+    for line in lines:
+        for i in [0, -1]:  # start and end point
+            all_points.append(line.coords[i])
+
+    internal_points = {
+        item for item, count in collections.Counter(all_points).items() if count >= 2
+    }  # Remove duplicates
+
+    return shapely.MultiPoint([Point(p) for p in internal_points])
 
 
 def strip_multiline_dangles(
@@ -347,7 +377,6 @@ def find_isolated_endpoints(
     isolated_endpoints = []
 
     if not isinstance(lines, MultiLineString):
-
         lines = MultiLineString(to_lines(lines))
 
     for i, line in enumerate(lines.geoms):
@@ -436,18 +465,18 @@ def snappy_endings(
         # find all vertices within a radius of max_distance as possible
         target = nearest_neighbor_within(snapping_points, endpoint, max_distance)
 
-        # do nothing if no target point to snap to is found
-        if not target:
+        if not target:  # do nothing if no target point to snap to is found
             continue
 
-            # find the LineString to modify within snapped_lines and update it
-        for i, snapped_line in enumerate(snapped_lines):
+        for i, snapped_line in enumerate(
+            snapped_lines
+        ):  # find the LineString to modify within snapped_lines and update it
             if endpoint.touches(snapped_line):
                 snapped_lines[i] = bend_towards(snapped_line, where=endpoint, to=target)
                 break
 
-        # also update the corresponding snapping_points
         for i, snapping_point in enumerate(snapping_points):
+            # also update the corresponding snapping_points
             if endpoint.equals(snapping_point):
                 snapping_points[i] = target
                 break
@@ -458,10 +487,66 @@ def snappy_endings(
     return snapped_lines
 
 
-def bend_towards(line: LineString, where: Point, to: Point) -> LineString:
+def snap_endings_to_points(
+    lines: Union[Iterable[LineString], MultiLineString],
+    snapping_points: Sequence[Point],
+    max_distance: float,
+) -> Sequence[Union[LineString, MultiLineString]]:
+    """
+    Snap endpoints of lines together if they are at most max_length apart.
+
+
+    :param snapping_points:
+    :param lines: A list of LineStrings or a MultiLineString
+    :param max_distance: maximum distance two endpoints may be joined together
+    :return:
+    :rtype: Sequence[Union[LineString, MultiLineString]]
+    """
+
+    # initialize snapped lines with list of original lines
+    # snapping points is a MultiPoint object of all vertices
+    snapped_lines = to_lines(lines)
+
+    if isinstance(snapping_points, MultiPoint):
+        snapping_points = list(snapping_points.geoms)
+
+    # isolated endpoints are going to snap to the closest vertex
+    isolated_endpoints = find_isolated_endpoints(snapped_lines)
+
+    # only move isolated endpoints, one by one
+    for endpoint in isolated_endpoints:
+        # find all vertices within a radius of max_distance as possible
+        target = nearest_neighbor_within(snapping_points, endpoint, max_distance)
+
+        if not target:  # do nothing if no target point to snap to is found
+            continue
+
+        for i, snapped_line in enumerate(
+            snapped_lines
+        ):  # find the LineString to modify within snapped_lines and update it
+            if endpoint.touches(snapped_line):
+                snapped_lines[i] = bend_towards(snapped_line, where=endpoint, to=target)
+                break
+
+        for i, snapping_point in enumerate(snapping_points):
+            # also update the corresponding snapping_points
+            if endpoint.equals(snapping_point):
+                snapping_points[i] = target
+                break
+
+    # post-processing: remove any resulting lines of length 0
+    snapped_lines = [s for s in snapped_lines if s.length > 0]
+
+    return snapped_lines
+
+
+def bend_towards(
+    line: LineString, where: Point, to: Point, tolerance: float = 1e-6
+) -> LineString:
     """
     Move the point where along a line to the point at location to.
 
+    :param tolerance:
     :param line:
     :param where: a point ON the line (not necessarily a vertex)
     :param to: a point NOT on the line where the nearest vertex will be moved to
@@ -474,7 +559,7 @@ def bend_towards(line: LineString, where: Point, to: Point) -> LineString:
     coords = line.coords[:]
     # easy case: where is (within numeric precision) a vertex of line
     for k, vertex in enumerate(coords):
-        if where.almost_equals(Point(vertex)):
+        if where.equals_exact(Point(vertex), tolerance=tolerance):
             # move coordinates of the vertex to destination
             coords[k] = to.coords[0]
             return LineString(coords)
@@ -520,7 +605,7 @@ def prune_short_lines(
 
 def linemerge(
     line_s: Union[
-        LineString, MultiLineString, Sequence[LineString], Sequence[MultiLineString]
+        LineString, MultiLineString, Iterable[LineString], Iterable[MultiLineString]
     ]
 ) -> Union[LineString, MultiLineString]:
     """
@@ -532,15 +617,26 @@ def linemerge(
     :type line_s: LineString|MultiLineString
     :rtype:LineString|MultiLineString
     """
-    lines = []
 
     assert isinstance(line_s, (LineString, MultiLineString, Sequence))
 
     if isinstance(line_s, LineString):
         return line_s
 
-    if isinstance(line_s, Sequence):
-        return shapely_linemerge([linemerge(l) for l in line_s])
+    lines = []
+
+    if isinstance(line_s, Iterable):
+        for l in line_s:
+            a = linemerge(l)
+            if isinstance(a, LineString):
+                lines.append(a)
+            elif isinstance(a, MultiLineString):
+                lines.extend(a.geoms)
+            else:
+                raise NotImplementedError(f"{type(a)} is not supported")
+
+        lines = [l for l in lines if not l.is_empty]
+        return shapely.ops.linemerge(lines)
 
     for line in line_s.geoms:
         if isinstance(line, MultiLineString):
@@ -550,7 +646,7 @@ def linemerge(
             # line is a line, so simply append it
             lines.append(line)
 
-    return shapely_linemerge(lines)
+    return shapely.ops.linemerge(lines)
 
 
 def are_incident(v1, v2) -> bool:
@@ -677,10 +773,13 @@ def extend_line(
 
 
 def extend_lines(
-    lines: Union[LineString, MultiLineString, Iterable[LineString]], distance: Number
+    lines: Union[LineString, MultiLineString, Iterable[LineString]],
+    distance: Number,
+    simplify: bool = False,
 ) -> List[LineString]:
     """
 
+    :param simplify:
     :param lines:
     :param distance:
     :return:
@@ -694,7 +793,7 @@ def extend_lines(
 
     out_lines = []
     for l in lines:
-        out_lines.append(extend_line(l, distance))
+        out_lines.append(extend_line(l, distance, simplify=simplify))
 
     return out_lines
 

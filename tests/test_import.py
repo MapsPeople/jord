@@ -2,6 +2,7 @@
 
 __author__ = "Christian Heider Lindbjerg"
 
+import pytest
 from warg import ensure_in_sys_path, find_nearest_ancestral_relative
 
 ensure_in_sys_path(find_nearest_ancestral_relative("jord").parent)
@@ -14,6 +15,7 @@ def test_import_package():
         print(jord.__version__)
 
 
+@pytest.mark.skipif(True, reason="Only with qgis present")
 def test_qgis_import_package():
     if True:
         from jord import qgis_utilities
@@ -28,6 +30,7 @@ def test_gdal_import_package():
         print(gdal_utilities.__doc__)
 
 
+@pytest.mark.skipif(True, reason="Only with qgis present")
 def test_qlive_import_package():
     if True:
         from jord import qlive_utilities

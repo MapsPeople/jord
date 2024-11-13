@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-from typing import Sequence, List, Optional, Union, Tuple, Iterable, Generator
+from typing import Generator, Iterable, List, Optional, Sequence, Tuple, Union
 
 import numpy
 import shapely
-from shapely.geometry import LineString, Point, MultiPoint
+from shapely.geometry import LineString, MultiPoint, Point
 from shapely.geometry.base import BaseGeometry
 from warg import Number
 
@@ -54,6 +54,9 @@ def nearest_neighbor_within(
     elif isinstance(interesting_points, Point):
         closest_point = interesting_points
     else:
+        if isinstance(interesting_points, MultiPoint):
+            interesting_points = list(interesting_points.geoms)
+
         distances = [
             point.distance(ip) for ip in interesting_points if point.distance(ip) > 0
         ]

@@ -22,7 +22,7 @@ def third_point() -> shapely.Point:
 
 
 @pytest.fixture(scope="module")
-def a_line(a_point: shapely.Point, another_point: shapely.Point) -> shapely.Point:
+def a_line(a_point: shapely.Point, another_point: shapely.Point) -> shapely.LineString:
     return shapely.LineString([a_point, another_point])
 
 

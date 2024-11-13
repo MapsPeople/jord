@@ -4,17 +4,20 @@ import sys
 from pathlib import Path
 from typing import Any, Optional
 
-__all__ = ["setup_logger"]
+__all__ = ["setup_logger", "add_logging_handler_once"]
 
 level_map = {
     logging.NOTSET: 0,  # Qgis.MessageLevel.NoLevel
-    # 0 When set on a logger, indicates that ancestor loggers are to be consulted to determine the effective level. If that still resolves to NOTSET, then all events are logged. When set on a handler, all events are handled.
+    # 0 When set on a logger, indicates that ancestor loggers are to be consulted to determine the effective
+    # level. If that still resolves to NOTSET, then all events are logged. When set on a handler, all events
+    # are handled.
     logging.DEBUG: 0,  # Qgis.MessageLevel.Info
     # 10 Detailed information, typically only of interest to a developer trying to diagnose a problem.
     logging.INFO: 0,  # Qgis.MessageLevel.Info  #Qgis.MessageLevel.Success
     # 20 Confirmation that things are working as expected.
     logging.WARNING: 1,  # Qgis.MessageLevel.Warning
-    # 30 An indication that something unexpected happened, or that a problem might occur in the near future (e.g. ‘disk space low’). The software is still working as expected.
+    # 30 An indication that something unexpected happened, or that a problem might occur in the near future
+    # (e.g. ‘disk space low’). The software is still working as expected.
     logging.ERROR: 2,  # Qgis.MessageLevel.Critical
     # 40 Due to a more serious problem, the software has not been able to perform some function.
     logging.CRITICAL: 2,  # Qgis.MessageLevel.Critical

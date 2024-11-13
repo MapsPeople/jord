@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Sequence
 
 import pandas
+import shapely.geometry.base
 from pandas import DataFrame
 from shapely import wkt
 
@@ -46,7 +47,9 @@ def load_wkts_from_csv(
     return df
 
 
-def csv_wkt_generator(csv_file_path: Path, geometry_column: str = "Shape") -> wkt:
+def csv_wkt_generator(
+    csv_file_path: Path, geometry_column: str = "Shape"
+) -> shapely.geometry.base.BaseGeometry:
     """
 
     :param csv_file_path:
@@ -56,7 +59,7 @@ def csv_wkt_generator(csv_file_path: Path, geometry_column: str = "Shape") -> wk
     for idx, g in pandas.read_csv(
         str(csv_file_path), usecols=[geometry_column]
     ).iterrows():
-        yield wkt.loads(g)
+        yield wkt.loads(g)  # g is a pandas Series?
 
 
 if __name__ == "__main__":

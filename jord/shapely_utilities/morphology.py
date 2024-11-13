@@ -15,6 +15,8 @@ __all__ = [
     "close",
     "clean_shape",
     "zero_buffer",
+    "pro_opening",
+    "pro_closing",
     "BecameEmptyException",
     "collapse_duplicate_vertices",
 ]

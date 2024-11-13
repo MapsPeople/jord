@@ -4,12 +4,7 @@ import statistics
 from typing import Generator, Iterable, List, Sequence, Tuple, Union
 
 import shapely
-from shapely.geometry import (
-    LineString,
-    MultiLineString,
-    MultiPolygon,
-    Polygon,
-)
+from shapely import MultiPolygon, Polygon
 from shapely.geometry.base import BaseGeometry
 from warg import Number, pairs
 
@@ -31,7 +26,7 @@ __all__ = [
 DEFAULT_DISTANCE = 1e-7
 
 
-def polygon_has_interior_rings(polygon: Polygon) -> bool:
+def polygon_has_interior_rings(polygon: shapely.Polygon) -> bool:
     """
 
     :param polygon:
@@ -43,18 +38,19 @@ def polygon_has_interior_rings(polygon: Polygon) -> bool:
 def mean_std_dev_line_length(geom: BaseGeometry) -> Tuple[float, float]:
     """
 
+    :return:
     :param geom:
     :return:
     """
     line_lengths = []
-    if isinstance(geom, LineString):
+    if isinstance(geom, shapely.LineString):
         for segment in segments(geom):
             line_lengths.append(segment.length)
-    elif isinstance(geom, MultiLineString):
+    elif isinstance(geom, shapely.MultiLineString):
         for li in geom.geoms:
             for segment in segments(li):
                 line_lengths.append(segment.length)
-    elif isinstance(geom, (Polygon, MultiPolygon)):
+    elif isinstance(geom, (shapely.Polygon, shapely.MultiPolygon)):
         exterior_rings, interior_rings = extract_poly_rings(geom)
         for ex_ring in exterior_rings:
             for segment in segments(ex_ring):
@@ -78,9 +74,9 @@ def mean_std_dev_area(geom: BaseGeometry) -> Tuple[float, float]:
     :return:
     """
     poly_areas = []
-    if isinstance(geom, Polygon):
+    if isinstance(geom, shapely.Polygon):
         poly_areas.append(geom.area)
-    elif isinstance(geom, MultiPolygon):
+    elif isinstance(geom, shapely.MultiPolygon):
         for po in geom.geoms:
             poly_areas.append(po.area)
     else:
@@ -130,39 +126,39 @@ def prune_rings(geom: BaseGeometry, eps: float = DEFAULT_DISTANCE) -> BaseGeomet
 
 
 def prune_holes(
-    geom: Union[MultiPolygon, Polygon], epsilon: Number = 1000
-) -> Union[MultiPolygon, Polygon]:
+    geom: Union[shapely.MultiPolygon, shapely.Polygon], epsilon: Number = 1000
+) -> Union[shapely.MultiPolygon, shapely.Polygon]:
     """
 
     :param epsilon:
     :param geom:
     :return:"""
 
-    if isinstance(geom, MultiPolygon):
+    if isinstance(geom, shapely.MultiPolygon):
         parts = []
 
         for polygon in geom.geoms:
             interiors = []
 
             for interior in polygon.interiors:
-                p = Polygon(interior)
+                p = shapely.Polygon(interior)
 
                 if p.area > epsilon:
                     interiors.append(interior)
 
-            temp_pol = Polygon(polygon.exterior.coords, holes=interiors)
+            temp_pol = shapely.Polygon(polygon.exterior.coords, holes=interiors)
             parts.append(temp_pol)
 
-        return MultiPolygon(parts)
+        return shapely.MultiPolygon(parts)
 
     interiors = []
 
     for interior in geom.interiors:
-        p = Polygon(interior)
+        p = shapely.Polygon(interior)
         if p.area > epsilon:
             interiors.append(interior)
 
-    return Polygon(geom.exterior.coords, holes=interiors)
+    return shapely.Polygon(geom.exterior.coords, holes=interiors)
 
 
 def get_coords_from_polygonal_shape(
@@ -186,7 +182,7 @@ def get_polygonal_shape_from_coords(
         Iterable[Iterable[Iterable[tuple[float, float]]]],
         Iterable[Iterable[tuple[float, float]]],
     ]
-) -> Union[Polygon, MultiPolygon, None]:
+) -> Union[shapely.Polygon, shapely.MultiPolygon, None]:
     outer = next(iter(coords), None)
 
     assert isinstance(outer, Iterable)
@@ -197,20 +193,22 @@ def get_polygonal_shape_from_coords(
             polygons = []
             for poly in coords:  # MultiPolygon and # MultiPolygon Holes
                 polygons.append(get_polygonal_shape_from_coords(poly))
-            return MultiPolygon(polygons)
+            return shapely.MultiPolygon(polygons)
         else:
             exterior, *interior = coords
             if interior:
-                return Polygon(exterior, holes=interior)
-            return Polygon(exterior)
+                return shapely.Polygon(exterior, holes=interior)
+            return shapely.Polygon(exterior)
 
     if len(coords[0]) == 0:
         return None
 
-    return Polygon(coords)
+    return shapely.Polygon(coords)
 
 
-def extract_poly_coords(geom: Union[Polygon, MultiPolygon]) -> Tuple[List, List]:
+def extract_poly_coords(
+    geom: Union[shapely.Polygon, shapely.MultiPolygon]
+) -> Tuple[List, List]:
     """
     TODO: Duplicate of get_coords_from_polygonal_shape
 
@@ -242,10 +240,10 @@ def extract_poly_rings(geom: BaseGeometry) -> Tuple[List, List]:
     """
     interior_rings = []
     exterior_rings = []
-    if isinstance(geom, Polygon):
+    if isinstance(geom, shapely.Polygon):
         exterior_rings.append(geom.exterior)
         interior_rings.extend(geom.interiors)
-    elif isinstance(geom, MultiPolygon):
+    elif isinstance(geom, shapely.MultiPolygon):
         for part in geom.geoms:
             exterior_rings.append(part.exterior)
             interior_rings.extend(part.interiors)
@@ -257,7 +255,7 @@ def extract_poly_rings(geom: BaseGeometry) -> Tuple[List, List]:
 
 def discard_holes(
     shape: Union[shapely.Polygon, shapely.MultiPolygon]
-) -> Union[Polygon, MultiPolygon]:
+) -> Union[shapely.Polygon, shapely.MultiPolygon]:
     if isinstance(shape, shapely.Polygon):
         return shapely.Polygon(shape.exterior.coords)
 
@@ -265,12 +263,12 @@ def discard_holes(
         shape_parts = []
         for shape_part in shape.geoms:
             shape_parts.append(shapely.Polygon(shape_part.exterior.coords))
-        return MultiPolygon(shape_parts)
+        return shapely.MultiPolygon(shape_parts)
 
     elif isinstance(shape, shapely.GeometryCollection):
         shape_parts = []
         for shape_part in shape.geoms:
-            if isinstance(shape_part, (Polygon, MultiPolygon)):
+            if isinstance(shape_part, (shapely.Polygon, shapely.MultiPolygon)):
                 shape_parts.append(discard_holes(shape_part))
             else:
                 shape_parts.append(shape_part)
@@ -287,7 +285,7 @@ def has_holes(shape: Union[shapely.Polygon, shapely.MultiPolygon]) -> bool:
     if is_multi(shape):
         return any(has_holes(s) for s in shape.geoms)
 
-    if isinstance(shape, Polygon):
+    if isinstance(shape, shapely.Polygon):
         return len(shape.interiors) > 0
 
     # raise #not polygonal
@@ -296,7 +294,13 @@ def has_holes(shape: Union[shapely.Polygon, shapely.MultiPolygon]) -> bool:
 
 def is_polygonal(cleaned):
     if isinstance(
-        cleaned, (shapely.Point, shapely.MultiPoint, LineString, MultiLineString)
+        cleaned,
+        (
+            shapely.Point,
+            shapely.MultiPoint,
+            shapely.LineString,
+            shapely.MultiLineString,
+        ),
     ):
         return False
     elif isinstance(cleaned, shapely.GeometryCollection):
@@ -306,26 +310,38 @@ def is_polygonal(cleaned):
 
 def iter_polygons(
     _input_geometry: BaseGeometry,
-) -> Union[Generator[Polygon, None, None], Tuple[BaseGeometry]]:
+) -> Union[Generator[shapely.Polygon, None, None], Tuple[BaseGeometry]]:
     """
 
     :param _input_geometry:
     :return:
     """
-    if isinstance(_input_geometry, MultiPolygon):
+    if isinstance(_input_geometry, shapely.MultiPolygon):
         return (polygon for polygon in _input_geometry.geoms)
     elif isinstance(_input_geometry, shapely.GeometryCollection):
         return (poly for poly in _input_geometry.geoms if is_polygonal(poly))
+    elif isinstance(_input_geometry, Iterable):
+        return (
+            y
+            for x in (
+                poly.geoms if is_multi(poly) else iter_polygons(poly)
+                for poly in _input_geometry
+                if is_polygonal(poly)
+            )
+            for y in x
+        )
 
-    # assert isinstance(_input_geometry, Polygon)
+    assert isinstance(_input_geometry, shapely.Polygon)
 
     return (_input_geometry,)
 
 
 def explode_polygons(
-    polygons: Union[Polygon, MultiPolygon, Sequence[Polygon]],
+    polygons: Union[shapely.Polygon, shapely.MultiPolygon, Sequence[shapely.Polygon]],
     return_index: bool = False,
-) -> Union[Sequence[LineString], Tuple[Sequence[LineString], Sequence[int]]]:
+) -> Union[
+    Sequence[shapely.LineString], Tuple[Sequence[shapely.LineString], Sequence[int]]
+]:
     """
 
     :param polygons:
@@ -335,19 +351,19 @@ def explode_polygons(
     lines_out = []
     index = []
 
-    if isinstance(polygons, Polygon):
+    if isinstance(polygons, shapely.Polygon):
         polygons = [polygons]
 
-    if isinstance(polygons, MultiPolygon):
+    if isinstance(polygons, shapely.MultiPolygon):
         polygons = polygons.geoms
 
     for i, l in enumerate(polygons):
-        for s in [LineString(s) for s in pairs(l.exterior.coords)]:
+        for s in [shapely.LineString(s) for s in pairs(l.exterior.coords)]:
             lines_out.append(s)
             index.append(i)
 
         for p in l.interiors:
-            lines_out.append(LineString(p.coords))
+            lines_out.append(shapely.LineString(p.coords))
             index.append(i)
 
     if return_index:
@@ -421,7 +437,7 @@ if __name__ == "__main__":
         multi_line = MultiLineString([line1, line2])
         polygon = Polygon([point2, point1, point3])
         polygon2 = Polygon([point3, point2, point1])
-        multi_polygon = MultiPolygon([polygon, polygon2])
+        multi_polygon = shapely.MultiPolygon([polygon, polygon2])
 
         print(mean_std_dev_line_length(line1))
         print(mean_std_dev_line_length(line2))
@@ -446,5 +462,5 @@ if __name__ == "__main__":
         p.plot()
         pyplot.show()
 
-    ahsudh()
+    # ahsudh()
     # aishdjauisd()

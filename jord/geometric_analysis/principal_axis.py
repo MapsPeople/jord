@@ -3,7 +3,6 @@ from enum import Enum
 from typing import Collection, Tuple, Union
 
 import shapely
-from geojson import LineString
 from shapely import affinity
 
 __all__ = [
@@ -27,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 def other_mass_projection_is_longer(
     poly: shapely.geometry.base.BaseGeometry,
-    first_axis: LineString,
+    first_axis: shapely.LineString,
     other_axis: shapely.LineString,
     hybrid_normalised_axes_projections: bool = False,
 ) -> bool:

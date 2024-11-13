@@ -1,7 +1,7 @@
-fail_fast: true
+fail_fast: false
 repos:
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.17.0
+    rev: v3.19.0
     hooks:
       - id: pyupgrade
         args:
@@ -20,13 +20,8 @@ repos:
       - id: prettier
         types: [yaml]
 
-  #  - repo: https://github.com/abravalheri/validate-pyproject
-  #    rev: v0.16
-  #    hooks:
-  #      - id: validate-pyproject
-
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.11.2
+    rev: v1.13.0
     hooks:
       - id: mypy
         verbose: true
@@ -98,7 +93,7 @@ repos:
         entry: check-executables-have-shebangs
         language: python
         types: [text, executable]
-        stages: [commit, push, manual]
+        stages: [pre-commit, pre-push, manual]
       - id: check-json
         name: check json
         description: checks json files for parseable syntax.
@@ -111,7 +106,7 @@ repos:
         entry: check-shebang-scripts-are-executable
         language: python
         types: [text]
-        stages: [commit, push, manual]
+        stages: [pre-commit, pre-push, manual]
       - id: check-merge-conflict
         name: check for merge conflicts
         description: checks for files that contain merge conflict strings.
@@ -172,7 +167,7 @@ repos:
         entry: end-of-file-fixer
         language: python
         types: [text]
-        stages: [commit, push, manual]
+        stages: [pre-commit, pre-push, manual]
       - id: file-contents-sorter
         name: file contents sorter
         description: sorts the lines in specified files (defaults to alphabetical). you must provide list of target files as input in your .pre-commit-config.yaml file.
@@ -215,49 +210,4 @@ repos:
         entry: trailing-whitespace-fixer
         language: python
         types: [text]
-        stages: [commit, push, manual]
-
-  #  - repo: local
-  #    hooks:
-  #      - id: sphinx-check
-  #        name: sphinx-check
-  #        entry: docs/make.sh
-  #        language: script
-  #        types: [ python ]
-  #        pass_filenames: false
-
-  #  - repo: local
-  #    hooks:
-  #      - id: pytest-check
-  #        name: pytest-check
-  #        entry: pytest migration --ignore-glob=*exclude*
-  #        language: system
-  #        pass_filenames: false
-  #        always_run: true
-
-  #  - repo: https://github.com/jshwi/docsig # BUGGY!
-  #    rev: v0.30.0
-  #    hooks:
-  #      - id: docsig
-  #        args:
-  #          - "--check-class"
-  #          - "--check-dunders"
-  #          - "--check-overridden"
-  #          - "--check-protected"
-  #          - "--summary"
-
-  #- repo: https://github.com/pycqa/pydocstyle # SLOW!
-  #  rev: 6.3.0  # pick a git hash / tag to point to
-  #  hooks:
-  #    - id: pydocstyle
-
-  #  - repo: https://github.com/jsh9/pydoclint
-  #    rev: 0.3.8
-  #    hooks:
-  #      - id: pydoclint
-  #        args:
-  #          [
-  #            --style=sphinx,
-  #            --check-return-types=False,
-  #            --arg-type-hints-in-docstring=False,
-  #          ]
+        stages: [pre-commit, pre-push, manual]
