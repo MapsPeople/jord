@@ -1,3 +1,4 @@
+import logging
 from typing import Any, Callable, List, Mapping, Sequence, Union
 
 import shapely
@@ -7,6 +8,8 @@ from .geometry_types import is_multi
 from .morphology import clean_shape, closing
 
 __all__ = ["overlap_groups"]
+
+logger = logging.getLogger(__name__)
 
 
 def overlap_groups(
@@ -49,10 +52,17 @@ def overlap_groups(
         groups.append(to_be_grouped)
     else:
         for union_part in unions.geoms:
+            union_part = clean_shape(union_part)
             incidentee = {}
             for k, v in to_be_grouped.items():
                 v = clean_shape(v)
-                if group_test(v, union_part):
+                try:
+                    g_test = group_test(v, union_part)
+                except shapely.errors.GEOSException as e:
+                    logger.error(e)  # Assume overlap was found
+                    g_test = True
+
+                if g_test:
                     if must_be_unique:
                         assert k not in already_grouped, f"{k, already_grouped, v}"
                     incidentee[k] = v
