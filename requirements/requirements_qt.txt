@@ -1,2 +1,2 @@
 #PySide2
-PyQt6
+PyQt6 >= 6.0.0

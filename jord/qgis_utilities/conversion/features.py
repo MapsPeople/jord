@@ -11,6 +11,7 @@ __all__ = [
     "GeometryIsEmptyError",
     "layer_data_generator",
     "feature_to_shapely",
+    "parse_q_value",
 ]
 
 

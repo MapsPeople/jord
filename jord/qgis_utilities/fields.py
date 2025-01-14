@@ -93,21 +93,34 @@ UNIQUE_VALUES_WIDGET = QgsEditorWidgetSetup(
 logger = logging.getLogger(__name__)
 
 
-def add_dropdown_widget(layer: Any, field_name: str, widget: Any) -> None:
+def add_dropdown_widget(layer: Any, field_name: str, form_widget: Any) -> None:
+    """
+
+    :param layer:
+    :param field_name:
+    :param form_widget:
+    :return:
+    """
     # https://gis.stackexchange.com/questions/470963/setting-dropdown-on-feature-attribute-form-using-plugin
     for layers_inner in layer:
         if layers_inner:
             if isinstance(layers_inner, Iterable):
                 for layer in layers_inner:
                     if layer:
+                        idx = layer.fields().indexFromName(field_name)
+                        if idx < 0:
+                            continue
                         layer.setEditorWidgetSetup(
-                            layer.fields().indexFromName(field_name),
-                            widget,
+                            idx,
+                            form_widget,
                         )
             else:
+                idx = layers_inner.fields().indexFromName(field_name)
+                if idx < 0:
+                    continue
                 layers_inner.setEditorWidgetSetup(
-                    layers_inner.fields().indexFromName(field_name),
-                    widget,
+                    idx,
+                    form_widget,
                 )
 
 
@@ -136,6 +149,9 @@ def make_field_unique(
                 for layer in layers_inner:
                     if layer:
                         idx = layer.fields().indexFromName(field_name)
+                        if idx < 0:
+                            continue
+
                         if unique_widget:
                             layer.setEditorWidgetSetup(
                                 idx,
@@ -156,6 +172,10 @@ def make_field_unique(
                         )
             else:
                 idx = layers_inner.fields().indexFromName(field_name)
+
+                if idx < 0:
+                    continue
+
                 if unique_widget:
                     layers_inner.setEditorWidgetSetup(
                         idx,
@@ -181,13 +201,16 @@ def make_field_not_null(layers: Sequence[Any], field_name: str = "name") -> None
                 for layers in layers_inner:
                     if layers:
                         idx = layers.fields().indexFromName(field_name)
+                        if idx < 0:
+                            continue
 
                         layers.setFieldConstraint(
                             idx, QgsFieldConstraints.ConstraintNotNull
                         )
             else:
                 idx = layers_inner.fields().indexFromName(field_name)
-
+                if idx < 0:
+                    continue
                 layers_inner.setFieldConstraint(
                     idx, QgsFieldConstraints.ConstraintNotNull
                 )
@@ -219,12 +242,20 @@ def make_field_boolean(layers: Sequence[Any], field_name: str) -> None:
             if isinstance(layers_inner, Iterable):
                 for layers in layers_inner:
                     if layers:
-                        layers.setDefaultValueDefinition(
-                            layers.fields().indexFromName(field_name), CHECKBOX_WIDGET
-                        )
+                        idx = layers.fields().indexFromName(field_name)
+
+                        if idx < 0:
+                            continue
+
+                        layers.setDefaultValueDefinition(idx, CHECKBOX_WIDGET)
             else:
+                idx = layers_inner.fields().indexFromName(field_name)
+
+                if idx < 0:
+                    continue
+
                 layers_inner.setEditorWidgetSetup(
-                    layers_inner.fields().indexFromName(field_name),
+                    idx,
                     CHECKBOX_WIDGET,
                 )
 
@@ -235,16 +266,22 @@ def make_field_reuse_last_entered_value(layers: Sequence[Any], field_name: str) 
             if isinstance(layers_inner, Iterable):
                 for layer in layers_inner:
                     if layer:
+                        idx = layer.fields().indexFromName(field_name)
+
+                        if idx < 0:
+                            continue
+
                         layer_form_config = layer.editFormConfig()
-                        layer_form_config.setReuseLastValue(
-                            layers.fields().indexFromName(field_name), True
-                        )
+                        layer_form_config.setReuseLastValue(idx, True)
                         layer.setEditFormConfig(layer_form_config)
             else:
+                idx = layers_inner.fields().indexFromName(field_name)
+
+                if idx < 0:
+                    continue
+
                 layer_form_config = layers_inner.editFormConfig()
-                layer_form_config.setReuseLastValue(
-                    layers_inner.fields().indexFromName(field_name), True
-                )
+                layer_form_config.setReuseLastValue(idx, True)
                 layers_inner.setEditFormConfig(layer_form_config)
 
 
@@ -255,7 +292,15 @@ def fit_field_to_length(layers: Sequence[Any], field_name: str, length: int) -> 
                 for layer in layers_inner:
                     if layer:
                         fields = layer.fields()
-                        fields[fields.indexFromName(field_name)].setLength(length)
+
+                        idx = fields.indexFromName(field_name)
+                        if idx < 0:
+                            continue
+
+                        fields[idx].setLength(length)
             else:
                 fields = layers_inner.fields()
-                fields[fields.indexFromName(field_name)].setLength(length)
+                idx = fields.indexFromName(field_name)
+                if idx < 0:
+                    continue
+                fields[idx].setLength(length)

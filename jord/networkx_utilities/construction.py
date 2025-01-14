@@ -1,7 +1,7 @@
 from typing import Any, Mapping
 
 import shapely
-from networkx import MultiDiGraph
+from networkx import MultiDiGraph, MultiGraph
 
 __all__ = [
     "assertive_add_edge",
@@ -18,7 +18,7 @@ class IllegalDuplicateEdgeException(Exception): ...
 
 
 def assertive_add_edge(
-    graph: MultiDiGraph,
+    graph: MultiGraph,
     u: int,
     v: int,
     uniqueid: int,
@@ -48,7 +48,6 @@ def assertive_add_edge(
     if not allow_loops:
         if u == v:
             raise IllegalLoopException(f"{u} == {v}")
-        # assert u != v, f"{u} == {v}"
 
     assert isinstance(u, int)
     assert isinstance(v, int)
@@ -61,14 +60,11 @@ def assertive_add_edge(
             raise IllegalDuplicateEdgeException(
                 f"Graph already contains the edge ({u} -> {v}) with {uniqueid=}"
             )
-        # assert not graph.has_edge(u, v, uniqueid)
 
     graph.add_edge(u, v, key=uniqueid, uniqueid=uniqueid, **attributes)
 
 
-def add_shapely_node(
-    graph: MultiDiGraph, u: int, point: shapely.Point, **kwargs
-) -> None:
+def add_shapely_node(graph: MultiGraph, u: int, point: shapely.Point, **kwargs) -> None:
     """
     Add a shapely point based node to the graph.
 
@@ -85,9 +81,7 @@ def add_shapely_node(
 
     graph.add_node(
         u,
-        lon=point.x,
-        lat=point.y,
-        x=point.x,
-        y=point.y,
+        x=float(point.x),
+        y=float(point.y),
         **kwargs,
     )
