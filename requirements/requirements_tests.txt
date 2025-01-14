@@ -1,2 +1,12 @@
+-r requirements_cad.txt
+-r requirements_fiona.txt
+-r requirements_geopandas.txt
+-r requirements_gdal.txt
+-r requirements_legacy.txt
+-r requirements_shapely.txt
+-r requirements_qt.txt
+-r requirements_networkx.txt
+-r requirements_pil.txt
+
 mock
 pytest>=4.4.1
