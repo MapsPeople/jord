@@ -95,13 +95,16 @@ logger = logging.getLogger(__name__)
 
 def add_dropdown_widget(layer: Any, field_name: str, form_widget: Any) -> None:
     """
-
-    :param layer:
-    :param field_name:
-    :param form_widget:
-    :return:
+    https://gis.stackexchange.com/questions/470963/setting-dropdown-on-feature-attribute-form-using-plugin
+      :param layer:
+      :param field_name:
+      :param form_widget:
+      :return:
     """
-    # https://gis.stackexchange.com/questions/470963/setting-dropdown-on-feature-attribute-form-using-plugin
+
+    if layer is None:
+        return
+
     for layers_inner in layer:
         if layers_inner:
             if isinstance(layers_inner, Iterable):
@@ -127,6 +130,9 @@ def add_dropdown_widget(layer: Any, field_name: str, form_widget: Any) -> None:
 def make_field_unique(
     layers: Sequence[Any], field_name: str = "admin_id", auto_generate: bool = True
 ) -> None:
+    if layers is None:
+        return
+
     unique_widget = None
     default_value_generator = None
 
@@ -195,6 +201,9 @@ def make_field_unique(
 
 
 def make_field_not_null(layers: Sequence[Any], field_name: str = "name") -> None:
+    if layers is None:
+        return
+
     for layers_inner in layers:
         if layers_inner:
             if isinstance(layers_inner, Iterable):
@@ -219,6 +228,9 @@ def make_field_not_null(layers: Sequence[Any], field_name: str = "name") -> None
 def make_field_default(
     layers: Sequence[Any], field_name: str, default_expression: str = "'None'"
 ) -> None:
+    if layers is None:
+        return
+
     default_value = QgsDefaultValue()
     default_value.setExpression(default_expression)
 
@@ -237,6 +249,9 @@ def make_field_default(
 
 
 def make_field_boolean(layers: Sequence[Any], field_name: str) -> None:
+    if layers is None:
+        return
+
     for layers_inner in layers:
         if layers_inner:
             if isinstance(layers_inner, Iterable):
@@ -261,6 +276,9 @@ def make_field_boolean(layers: Sequence[Any], field_name: str) -> None:
 
 
 def make_field_reuse_last_entered_value(layers: Sequence[Any], field_name: str) -> None:
+    if layers is None:
+        return
+
     for layers_inner in layers:
         if layers_inner:
             if isinstance(layers_inner, Iterable):
@@ -286,6 +304,9 @@ def make_field_reuse_last_entered_value(layers: Sequence[Any], field_name: str) 
 
 
 def fit_field_to_length(layers: Sequence[Any], field_name: str, length: int) -> None:
+    if layers is None:
+        return
+
     for layers_inner in layers:
         if layers_inner:
             if isinstance(layers_inner, Iterable):
