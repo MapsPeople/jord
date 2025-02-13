@@ -36,6 +36,7 @@ def convert_to_dxf(
     oda_converter_path: Optional[
         Path
     ] = r"C:\Program Files\ODA\ODAFileConverter 25.4.0\ODAFileConverter.exe",
+    target_dir: Optional[Path] = None,
 ) -> Path:
     # Load a DWG file
     # doc = odafc.readfile('my.dwg')
@@ -57,7 +58,16 @@ def convert_to_dxf(
     if not isinstance(dwg_file_path, Path):
         dwg_file_path = Path(dwg_file_path)
 
-    dxf_file_path = dwg_file_path.with_suffix(".dxf")
+    if target_dir:
+        if not isinstance(target_dir, Path):
+            target_dir = Path(target_dir)
+
+        if not target_dir.exists():
+            target_dir.mkdir(parents=True, exist_ok=True)
+
+        dxf_file_path = target_dir / dwg_file_path.name
+    else:
+        dxf_file_path = dwg_file_path.with_suffix(".dxf")
 
     odafc.convert(str(dwg_file_path), str(dxf_file_path), replace=True)
 
