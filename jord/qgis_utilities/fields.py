@@ -93,7 +93,7 @@ UNIQUE_VALUES_WIDGET = QgsEditorWidgetSetup(
 logger = logging.getLogger(__name__)
 
 
-def add_dropdown_widget(layer: Any, field_name: str, form_widget: Any) -> None:
+def add_dropdown_widget(layers: Any, field_name: str, form_widget: Any) -> None:
     """
     https://gis.stackexchange.com/questions/470963/setting-dropdown-on-feature-attribute-form-using-plugin
       :param layer:
@@ -102,10 +102,10 @@ def add_dropdown_widget(layer: Any, field_name: str, form_widget: Any) -> None:
       :return:
     """
 
-    if layer is None:
+    if layers is None:
         return
 
-    for layers_inner in layer:
+    for layers_inner in layers:
         if layers_inner:
             if isinstance(layers_inner, Iterable):
                 for layer in layers_inner:

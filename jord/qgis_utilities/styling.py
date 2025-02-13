@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import logging
-from typing import Mapping
+from typing import Iterable, Mapping
 
 # noinspection PyUnresolvedReferences
 from qgis.PyQt.QtGui import QColor
@@ -16,9 +16,14 @@ from qgis.core import (
 )
 from warg import TripleNumber
 
-__all__ = ["style_layer_from_mapping"]
+__all__ = ["style_layer_from_mapping", "set3dviewsettings"]
 
-from jord.qgis_utilities.enums import Qgis3dCullingMode, Qgis3dFacade
+from jord.qgis_utilities.enums import (
+    Qgis3dAltitudeClamping,
+    Qgis3dAltitudeBinding,
+    Qgis3dCullingMode,
+    Qgis3dFacade,
+)
 
 
 def style_layer_from_mapping(
@@ -28,6 +33,8 @@ def style_layer_from_mapping(
     default_color: TripleNumber = (0, 0, 0),
     default_opacity: float = 1.0,
     default_width: float = 0.1,
+    *,
+    repaint: bool = True,
 ) -> None:
     if layer is None:
         return
@@ -66,44 +73,64 @@ def style_layer_from_mapping(
         )
 
     layer.setRenderer(QgsCategorizedSymbolRenderer(field_name, render_categories))
-    layer.triggerRepaint()
+    if repaint:
+        layer.triggerRepaint()
 
 
 def set3dviewsettings(
-    layer: QgsVectorLayer,
+    layers: QgsVectorLayer,
     offset: float = 0,
     extrusion: float = 4,
+    color: TripleNumber = (222, 222, 222),
+    facades: Qgis3dFacade = Qgis3dFacade.walls,
+    culling_mode: Qgis3dCullingMode = Qgis3dCullingMode.front_face,
+    *,
+    repaint: bool = True,
 ) -> None:
-    if layer is None:
+    if layers is None:
         return
 
     import qgis._3d as q3d
 
     symbol = q3d.QgsPolygon3DSymbol()
     symbol.setAddBackFaces(False)
-    symbol.setAltitudeBinding(1)
-    symbol.setAltitudeClamping(0)
-    symbol.setCullingMode(Qgis3dCullingMode.front_face.value)
+    symbol.setAltitudeBinding(Qgis3dAltitudeBinding.centroid.value)
+    symbol.setAltitudeClamping(Qgis3dAltitudeClamping.absolute.value)
+    symbol.setCullingMode(culling_mode.value)
     # symbol.setHeight()
     symbol.setOffset(offset)
     symbol.setExtrusionHeight(extrusion)
-    symbol.setRenderedFacade(Qgis3dFacade.walls.value)
+    symbol.setRenderedFacade(facades.value)
     symbol.setEdgesEnabled(True)
-    symbol.setEdgeWidth(0.1)
+    symbol.setEdgeWidth(1.0)
+    symbol.setEdgeColor(QColor(255, 255, 255))
 
     # symbol.setInvertNormals(False)
     # symbol.setEdgeColor(QColor(0, 0, 0))
     # symbol.setShape(q3d.QgsSymbol3DShape.Cylinder)
 
     material_settings = q3d.QgsPhongMaterialSettings()
-    material_settings.setAmbient(QColor(255, 0, 0))
-    material_settings.setDiffuse(QColor(255, 0, 0))
-    material_settings.setSpecular(QColor(255, 0, 0))
-    symbol.setMaterial(material_settings)
+    qcolor = QColor(*color)
+
+    material_settings.setAmbient(qcolor)
+    material_settings.setDiffuse(qcolor)
+    material_settings.setSpecular(qcolor)
+    symbol.setMaterialSettings(material_settings)
 
     renderer = q3d.QgsVectorLayer3DRenderer()
     renderer.setSymbol(symbol)
 
-    # renderer.setLayer(layer)
-    layer.setRenderer3D(renderer)
-    layer.triggerRepaint()
+    for layers_inner in layers:
+        if layers_inner:
+            if isinstance(layers_inner, Iterable):
+                for layer in layers_inner:
+                    if layer:
+                        # renderer.setLayer(layer)
+                        layer.setRenderer3D(renderer)
+                        if repaint:
+                            layer.triggerRepaint()
+            else:
+                # renderer.setLayer(layers_inner)
+                layers_inner.setRenderer3D(renderer)
+                if repaint:
+                    layers_inner.triggerRepaint()
