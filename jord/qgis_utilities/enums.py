@@ -15,7 +15,14 @@ from qgis.core import (
 
 from jord.geojson_utilities import GeoJsonGeometryTypesEnum
 
-__all__ = ["QgisRendererEnum", "QgisLayerTypeEnum", "Qgis3dCullingMode", "Qgis3dFacade"]
+__all__ = [
+    "QgisRendererEnum",
+    "QgisLayerTypeEnum",
+    "Qgis3dCullingMode",
+    "Qgis3dFacade",
+    "Qgis3dAltitudeBinding",
+    "Qgis3dAltitudeClamping",
+]
 
 
 class QgisRendererEnum(Enum):

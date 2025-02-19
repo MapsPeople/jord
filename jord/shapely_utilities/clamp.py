@@ -116,7 +116,7 @@ def adjust_line_end(line: LineString, end: BaseGeometry) -> LineString:
 
 
 def ensure_list_of_geometries(
-    thing: Union[BaseGeometry, BaseMultipartGeometry]
+    thing: Union[BaseGeometry, BaseMultipartGeometry],
 ) -> List[BaseGeometry]:
     """
 

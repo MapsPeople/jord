@@ -162,7 +162,7 @@ def prune_holes(
 
 
 def get_coords_from_polygonal_shape(
-    shape: Union[shapely.Polygon, shapely.MultiPolygon]
+    shape: Union[shapely.Polygon, shapely.MultiPolygon],
 ) -> List[List[List[tuple[float, float]]]]:
     coords = []
 
@@ -181,7 +181,7 @@ def get_polygonal_shape_from_coords(
     coords: Union[
         Iterable[Iterable[Iterable[tuple[float, float]]]],
         Iterable[Iterable[tuple[float, float]]],
-    ]
+    ],
 ) -> Union[shapely.Polygon, shapely.MultiPolygon, None]:
     outer = next(iter(coords), None)
 
@@ -207,7 +207,7 @@ def get_polygonal_shape_from_coords(
 
 
 def extract_poly_coords(
-    geom: Union[shapely.Polygon, shapely.MultiPolygon]
+    geom: Union[shapely.Polygon, shapely.MultiPolygon],
 ) -> Tuple[List, List]:
     """
     TODO: Duplicate of get_coords_from_polygonal_shape
@@ -254,7 +254,7 @@ def extract_poly_rings(geom: BaseGeometry) -> Tuple[List, List]:
 
 
 def discard_holes(
-    shape: Union[shapely.Polygon, shapely.MultiPolygon]
+    shape: Union[shapely.Polygon, shapely.MultiPolygon],
 ) -> Union[shapely.Polygon, shapely.MultiPolygon]:
     if isinstance(shape, shapely.Polygon):
         return shapely.Polygon(shape.exterior.coords)

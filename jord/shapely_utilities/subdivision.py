@@ -11,7 +11,7 @@ __all__ = ["subdivide", "subdivide_polygon", "subdivide_line", "subdivide_ring"]
 
 
 def subdivide(
-    geom: Union[LineString, LinearRing, Polygon]
+    geom: Union[LineString, LinearRing, Polygon],
 ) -> Union[LineString, LinearRing, Polygon]:
     if isinstance(geom, LineString):
         return subdivide_line(geom)

@@ -70,7 +70,7 @@ EPSILON = 1e-6
 
 
 def to_single_line(
-    s: Union[LineString, MultiLineString, Iterable[LineString]]
+    s: Union[LineString, MultiLineString, Iterable[LineString]],
 ) -> LineString:
     """
     assume that lines are ordered, NOTE closes of gaps!
@@ -98,7 +98,7 @@ def to_single_line(
 
 
 def to_lines(
-    geoms: Union[Sequence[BaseGeometry], LineString, MultiLineString]
+    geoms: Union[Sequence[BaseGeometry], LineString, MultiLineString],
 ) -> List[LineString]:
     """
     Converts Shapely geoms in to Shapely LineString
@@ -241,7 +241,7 @@ def line_endpoints(lines: Union[List[LineString], MultiLineString]) -> MultiPoin
 
 
 def internal_points(
-    lines: Union[List[LineString], MultiLineString]
+    lines: Union[List[LineString], MultiLineString],
 ) -> shapely.MultiPoint:
     """
 
@@ -352,7 +352,7 @@ def explode_line(line: Union[LineString, MultiLineString]) -> List[LineString]:
 
 
 def explode_lines(
-    lines: Iterable[Union[LineString, MultiLineString]]
+    lines: Iterable[Union[LineString, MultiLineString]],
 ) -> list[LineString]:
     """
     :param lines: List of LineStrings or MultiLineStrings to be exploded
@@ -606,7 +606,7 @@ def prune_short_lines(
 def linemerge(
     line_s: Union[
         LineString, MultiLineString, Iterable[LineString], Iterable[MultiLineString]
-    ]
+    ],
 ) -> Union[LineString, MultiLineString]:
     """
     Merge a list of LineStrings and/or MultiLineStrings.
