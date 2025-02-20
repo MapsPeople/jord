@@ -25,7 +25,7 @@ def subdivide(
 
 def subdivide_line(line: LineString) -> LineString:
     half_point = line.interpolate(0.5, normalized=True)
-    return shapely.LineString((line.coords[0], *(half_point.coords), line.coords[-1]))
+    return shapely.LineString((line.coords[0], *half_point.coords, line.coords[-1]))
 
 
 def subdivide_ring(ring: LinearRing) -> LinearRing:

@@ -60,7 +60,7 @@ def style_layer_from_mapping(
                 cat_width = max(0.0, float(style["width"]))
 
         symbol = QgsSymbol.defaultSymbol(layer.geometryType())
-        symbol.setColor(QColor(*(cat_color), 255))
+        symbol.setColor(QColor(*cat_color, 255))
         symbol.setOpacity(cat_opacity)
 
         if isinstance(symbol, QgsLineSymbol):

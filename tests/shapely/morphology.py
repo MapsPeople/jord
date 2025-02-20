@@ -35,7 +35,7 @@ from jord.shapely_utilities.morphology import clean_shape
 )
 @pytest.mark.parametrize(
     "operation",
-    ((dilate, erode, closing, opening)),
+    (dilate, erode, closing, opening),
 )
 def test_operation_zero(operation, shape):
     shape.equals(operation(shape, distance=0))
