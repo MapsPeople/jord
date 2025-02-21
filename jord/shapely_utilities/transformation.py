@@ -76,7 +76,7 @@ def get_helmert_transformation_parameters(
 
 
 def get_affine_transform_parameters(
-    displacements: Iterable[Tuple[Tuple[float, float], Tuple[float, float]]]
+    displacements: Iterable[Tuple[Tuple[float, float], Tuple[float, float]]],
 ) -> List[float]:
     """
 

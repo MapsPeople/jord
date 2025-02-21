@@ -11,7 +11,7 @@ __all__ = ["subdivide", "subdivide_polygon", "subdivide_line", "subdivide_ring"]
 
 
 def subdivide(
-    geom: Union[LineString, LinearRing, Polygon]
+    geom: Union[LineString, LinearRing, Polygon],
 ) -> Union[LineString, LinearRing, Polygon]:
     if isinstance(geom, LineString):
         return subdivide_line(geom)
@@ -25,7 +25,7 @@ def subdivide(
 
 def subdivide_line(line: LineString) -> LineString:
     half_point = line.interpolate(0.5, normalized=True)
-    return shapely.LineString((line.coords[0], *(half_point.coords), line.coords[-1]))
+    return shapely.LineString((line.coords[0], *half_point.coords, line.coords[-1]))
 
 
 def subdivide_ring(ring: LinearRing) -> LinearRing:

@@ -89,7 +89,7 @@ def ridge_is_finite(ridge: Iterable) -> bool:
 def create_point_with_restored_coordinates(
     x: float, y: float, _min_x: float, _min_y: float
 ) -> Tuple[float, float]:
-    return (x + _min_x, y + _min_y)
+    return x + _min_x, y + _min_y
 
 
 def linestring_is_within_input_geometry(
@@ -131,7 +131,7 @@ def interpolated_boundary(
 def create_point_with_reduced_coordinates(
     x: float, y: float, _min_x: float, _min_y: float
 ) -> Tuple[float, float]:
-    return (x - _min_x, y - _min_y)
+    return x - _min_x, y - _min_y
 
 
 def get_coordinates_of_first_point(

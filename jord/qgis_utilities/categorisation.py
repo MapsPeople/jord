@@ -32,7 +32,7 @@ def random_rgb(mix: TripleNumber = (255, 255, 255)) -> TripleNumber:
     red = random.randrange(0, mix[0])
     green = random.randrange(0, mix[1])
     blue = random.randrange(0, mix[2])
-    return (red, green, blue)
+    return red, green, blue
 
 
 def random_rgba(mix: QuadNumber = (1, 1, 1, 1)) -> QuadNumber:
@@ -40,15 +40,15 @@ def random_rgba(mix: QuadNumber = (1, 1, 1, 1)) -> QuadNumber:
     green = random.randrange(0, mix[1])
     blue = random.randrange(0, mix[2])
     alpha = random.randrange(0, mix[3])
-    return (red, green, blue, alpha)
+    return red, green, blue, alpha
 
 
-def random_color_generator() -> TripleNumber:
+def random_color_generator() -> Generator[TripleNumber, None, None]:
     while 1:
         yield random_rgb()
 
 
-def random_color_alpha_generator() -> QuadNumber:
+def random_color_alpha_generator() -> Generator[QuadNumber, None, None]:
     while 1:
         yield random_rgba()
 

@@ -70,7 +70,7 @@ EPSILON = 1e-6
 
 
 def to_single_line(
-    s: Union[LineString, MultiLineString, Iterable[LineString]]
+    s: Union[LineString, MultiLineString, Iterable[LineString]],
 ) -> LineString:
     """
     assume that lines are ordered, NOTE closes of gaps!
@@ -98,7 +98,7 @@ def to_single_line(
 
 
 def to_lines(
-    geoms: Union[Sequence[BaseGeometry], LineString, MultiLineString]
+    geoms: Union[Sequence[BaseGeometry], LineString, MultiLineString],
 ) -> List[LineString]:
     """
     Converts Shapely geoms in to Shapely LineString
@@ -115,11 +115,11 @@ def to_lines(
 
     if isinstance(geoms, Iterable):
         for g in geoms:
-            if isinstance(g, (LineString)):
+            if isinstance(g, LineString):
                 lines.append(g)
             elif isinstance(g, MultiLineString):
                 lines.extend(g.geoms)
-            elif isinstance(g, (BaseGeometry)):
+            elif isinstance(g, BaseGeometry):
                 boundary = g.boundary
                 if boundary:
                     if isinstance(boundary, MultiLineString):
@@ -140,7 +140,7 @@ def to_lines(
         lines = geoms.geoms
     elif isinstance(geoms, LineString):
         lines = [geoms]
-    elif isinstance(geoms, (BaseGeometry)):
+    elif isinstance(geoms, BaseGeometry):
         boundary = geoms.boundary
         if boundary:
             if isinstance(boundary, MultiLineString):
@@ -241,7 +241,7 @@ def line_endpoints(lines: Union[List[LineString], MultiLineString]) -> MultiPoin
 
 
 def internal_points(
-    lines: Union[List[LineString], MultiLineString]
+    lines: Union[List[LineString], MultiLineString],
 ) -> shapely.MultiPoint:
     """
 
@@ -352,7 +352,7 @@ def explode_line(line: Union[LineString, MultiLineString]) -> List[LineString]:
 
 
 def explode_lines(
-    lines: Iterable[Union[LineString, MultiLineString]]
+    lines: Iterable[Union[LineString, MultiLineString]],
 ) -> list[LineString]:
     """
     :param lines: List of LineStrings or MultiLineStrings to be exploded
@@ -606,7 +606,7 @@ def prune_short_lines(
 def linemerge(
     line_s: Union[
         LineString, MultiLineString, Iterable[LineString], Iterable[MultiLineString]
-    ]
+    ],
 ) -> Union[LineString, MultiLineString]:
     """
     Merge a list of LineStrings and/or MultiLineStrings.
@@ -703,7 +703,7 @@ def intersecting_lines(of: LineString, lines: Sequence[LineString]) -> List[Line
     :param lines: List of LineStrings in which to search for neighbors
     :return: list of indices, so that all lines[indices] touch the LineString of
     """
-    return [line for line in (lines) if line.touches(of)]
+    return [line for line in lines if line.touches(of)]
 
 
 def linestring_azimuth(linestring: LineString, verbose: bool = False) -> float:
@@ -834,7 +834,7 @@ def cap_lines(
     cap1 = perpendicular_line(start_line, length)
     cap2 = perpendicular_line(end_line, length)
 
-    return (cap1, cap2)
+    return cap1, cap2
 
 
 def perpendicular_line(l1: LineString, length: float) -> LineString:
