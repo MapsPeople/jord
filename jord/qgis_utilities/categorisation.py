@@ -11,6 +11,7 @@ from qgis.PyQt.QtGui import QColor
 from qgis.core import (
     QgsCategorizedSymbolRenderer,
     QgsRendererCategory,
+    QgsSimpleFillSymbolLayer,
     QgsSymbol,
     QgsVectorLayer,
 )
@@ -56,7 +57,13 @@ def random_color_alpha_generator() -> Generator[QuadNumber, None, None]:
 def categorise_layer(
     layer: QgsVectorLayer,
     field_name: str = "layer",
-    iterable: Iterable = n_uint_mix_generator_builder(255, 255, 255, mix_min=(0, 0, 0)),
+    *,
+    color_iterable: Iterable = n_uint_mix_generator_builder(
+        255, 255, 255, mix_min=(0, 0, 0)
+    ),
+    opacity: float = 1.0,
+    outline_only: bool = False,
+    outline_width=1.0,
 ) -> None:
     """
 
@@ -65,19 +72,21 @@ def categorise_layer(
 
     :param layer:
     :param field_name:
-    :param iterable:
+    :param color_iterable:
     :return:
     """
 
-    if isinstance(iterable, Sized):
+    if isinstance(color_iterable, Sized):
         # noinspection PyTypeChecker
-        iterable = cycle(iterable)
+        color_iterable = cycle(color_iterable)
 
-    if isinstance(iterable, Callable) and not isinstance(iterable, Generator):
+    if isinstance(color_iterable, Callable) and not isinstance(
+        color_iterable, Generator
+    ):
         # noinspection PyCallingNonCallable
-        iterable = iterable()  # Compat
+        color_iterable = color_iterable()  # Compat
 
-    color_iter = iter(iterable)
+    color_iter = iter(color_iterable)
 
     available_field_names = layer.fields().names()
 
@@ -89,12 +98,7 @@ def categorise_layer(
     for cat in layer.uniqueValues(layer.fields().indexFromName(field_name)):
         if cat is not None:
             sym = QgsSymbol.defaultSymbol(layer.geometryType())
-            col = next(color_iter)
-
-            if len(col) == 3:
-                col = (*col, 255)
-
-            sym.setColor(QColor(*col))
+            set_symbol_styling(color_iter, opacity, outline_only, outline_width, sym)
 
             render_categories.append(
                 QgsRendererCategory(cat, symbol=sym, label=str(cat), render=True)
@@ -102,12 +106,17 @@ def categorise_layer(
 
     if True:  # add default
         sym = QgsSymbol.defaultSymbol(layer.geometryType())
-        col = next(color_iter)
+        # https://qgis.org/pyqgis/master/core/QgsSymbolLayer.html#qgis.core.QgsSymbolLayer.setFillColor
+        # https://qgis.org/pyqgis/3.40/core/QgsSimpleLineSymbolLayer.html
+        # QgsLinePatternFillSymbolLayer
 
-        if len(col) == 3:
-            col = (*col, 255)
+        # sym.symbolLayer(0).setStrokeColor(QColor(*col))
+        # StrokeWidth
+        # StrokeStyle
+        # FillColor
+        # FillStyle
 
-        sym.setColor(QColor(*col))
+        set_symbol_styling(color_iter, opacity, outline_only, outline_width, sym)
 
         render_categories.append(
             QgsRendererCategory("", symbol=sym, label="default", render=True)
@@ -128,3 +137,18 @@ def categorise_layer(
     layer.setRenderer(QgsCategorizedSymbolRenderer(field_name, render_categories))
     layer.triggerRepaint()
     iface.layerTreeView().refreshLayerSymbology(layer.id())
+
+
+def set_symbol_styling(color_iter, opacity, outline_only, outline_width, sym) -> None:
+    col = next(color_iter)
+    if len(col) == 3:
+        col = (*col, 255)
+    if outline_only:
+        outline_symbol_layer = QgsSimpleFillSymbolLayer()
+        outline_symbol_layer.setColor(QColor("transparent"))
+        outline_symbol_layer.setStrokeWidth(outline_width)
+        outline_symbol_layer.setStrokeColor(QColor(*col))
+        sym.changeSymbolLayer(0, outline_symbol_layer)
+    else:
+        sym.setColor(QColor(*col))
+    sym.setOpacity(opacity)
