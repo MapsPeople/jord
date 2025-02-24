@@ -154,6 +154,7 @@ def add_qgis_single_feature_layer(
     ),
     group: Any = None,
     visible: bool = True,
+    opacity: float = 1.0,
 ) -> List:
     """
     An example url is “Point?crs=epsg:4326&field=id:integer&field=name:string(20)&index=yes”
@@ -279,7 +280,10 @@ def add_qgis_single_feature_layer(
 
             if categorise_by_attribute:
                 categorise_layer(
-                    sub_layer, categorise_by_attribute, iterable=color_generator
+                    sub_layer,
+                    categorise_by_attribute,
+                    color_iterable=color_generator,
+                    opacity=opacity,
                 )
 
             sub_layer.commitChanges()
@@ -344,7 +348,12 @@ def add_qgis_single_feature_layer(
             layer.setCustomProperty("skipMemoryLayersCheck", 1)
 
         if categorise_by_attribute:
-            categorise_layer(layer, categorise_by_attribute, iterable=color_generator)
+            categorise_layer(
+                layer,
+                categorise_by_attribute,
+                color_iterable=color_generator,
+                opacity=opacity,
+            )
 
         layer.commitChanges()
         layer.updateFields()
@@ -392,6 +401,7 @@ def add_qgis_multi_feature_layer(
     index: bool = False,
     group: Any = None,
     visible: bool = True,
+    opacity: float = 1.0,
 ) -> Optional[List]:
     """
 
@@ -605,7 +615,12 @@ def add_qgis_multi_feature_layer(
         layer.setCustomProperty("skipMemoryLayersCheck", 1)
 
     if categorise_by_attribute:
-        categorise_layer(layer, categorise_by_attribute, iterable=color_generator)
+        categorise_layer(
+            layer,
+            categorise_by_attribute,
+            color_iterable=color_generator,
+            opacity=opacity,
+        )
 
     if STRICT:
         assert (
