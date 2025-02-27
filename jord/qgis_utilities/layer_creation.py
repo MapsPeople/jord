@@ -152,6 +152,7 @@ def add_qgis_single_feature_layer(
     group: Any = None,
     visible: bool = True,
     opacity: float = 1.0,
+    measurements: Optional[Iterable[Iterable[float]]] = None,
 ) -> List:
     """
     An example url is “Point?crs=epsg:4326&field=id:integer&field=name:string(20)&index=yes”
@@ -409,6 +410,7 @@ def add_qgis_multi_feature_layer(
     group: Any = None,
     visible: bool = True,
     opacity: float = 1.0,
+    measurements: Optional[Iterable[Iterable[float]]] = None,
 ) -> Optional[List]:
     """
 
@@ -535,7 +537,18 @@ def add_qgis_multi_feature_layer(
 
                 return_collection.extend(
                     add_qgis_multi_feature_layer(
-                        qgis_instance_handle, g, f"{name}_{sub_type}"
+                        qgis_instance_handle,
+                        g,
+                        f"{name}_{sub_type}",
+                        crs=crs,
+                        columns=columns,
+                        categorise_by_attribute=categorise_by_attribute,
+                        color_generator=color_generator,
+                        index=index,
+                        group=group,
+                        visible=visible,
+                        opacity=opacity,
+                        measurements=measurements,  # TODO: THIS WILL BE WEIRD!
                     )
                 )
             return return_collection
