@@ -103,7 +103,7 @@ def transform_features(
     layer = tree_layer.layer()
 
     if not layer.isValid():
-        logger.error(f"{tree_layer.layer().name()} is not valid!")
+        logger.error(f"{layer.name()} is not valid!")
         return
 
     layer.startEditing()
@@ -113,7 +113,16 @@ def transform_features(
     )
 
     for idx, feat in enumerate(layer.getFeatures()):
-        assert feat.hasGeometry()
+        if not feat.hasGeometry():
+            if False:
+                assert (
+                    feat.hasGeometry()
+                ), f"Feature {idx} of {layer.name()} has no geometry"
+            else:
+                logger.error(
+                    f"Feature {idx} of {layer.name()} has no geometry, skipping"
+                )
+                continue
         geometry = feat.geometry()
         if pre_transformer:
             geometry.transform(

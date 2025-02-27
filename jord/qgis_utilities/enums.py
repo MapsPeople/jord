@@ -34,6 +34,12 @@ class QgisRendererEnum(Enum):
 
 
 class QgisLayerTypeEnum(Enum):
+    """
+    This enum is useful for exhaustively iterating possible GeoJson types.
+
+    NOTE: Z coordinate support is not included in this enum.
+    """
+
     point = GeoJsonGeometryTypesEnum.point.value.__name__
     multi_point = GeoJsonGeometryTypesEnum.multi_point.value.__name__
     line_string = GeoJsonGeometryTypesEnum.line_string.value.__name__

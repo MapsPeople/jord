@@ -30,7 +30,7 @@ repos:
         #args: [ --strict ]
 
   - repo: https://github.com/pycqa/flake8
-    rev: 7.1.1 # pick a git hash / tag to point to
+    rev: 7.1.2 # pick a git hash / tag to point to
     hooks:
       - id: flake8 # stop the build if there are Python syntax errors or undefined names
         additional_dependencies: [flake8-docstrings]

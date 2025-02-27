@@ -252,6 +252,8 @@ def add_shapely_geometry(
     :param qgis_instance_handle:
     :return:
     """
+    # geom: shapely.geometry.base.BaseGeometry
+    # assert geom.has_z, f"{geom=} does not have z"
 
     return add_wkb(qgis_instance_handle, geom.wkb, *args, **kwargs)
 

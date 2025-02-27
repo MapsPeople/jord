@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
 import datetime
-import json
 import logging
 import time
 from typing import Any, Collection, Iterable, List, Mapping, Optional, Union
 
 from warg import n_uint_mix_generator_builder, passes_kws_to
-
-from jord.geojson_utilities import GeoJsonGeometryTypesEnum
 
 APPEND_TIMESTAMP = True
 SKIP_MEMORY_LAYER_CHECK_AT_CLOSE = True
@@ -155,6 +152,7 @@ def add_qgis_single_feature_layer(
     group: Any = None,
     visible: bool = True,
     opacity: float = 1.0,
+    measurements: Optional[Iterable[Iterable[float]]] = None,
 ) -> List:
     """
     An example url is “Point?crs=epsg:4326&field=id:integer&field=name:string(20)&index=yes”
@@ -195,14 +193,17 @@ def add_qgis_single_feature_layer(
 
     return_collection = []
 
-    geom_json = json.loads(geom.asJson())
-    if geom_json is None:
+    from qgis.core import QgsWkbTypes
+
+    if geom.wkbType() == QgsWkbTypes.NoGeometry:
         return return_collection
 
-    geom_type = geom_json["type"]
+    geom_type = QgsWkbTypes.translatedDisplayString(geom.wkbType())
+
+    if True:
+        logger.error(f"{geom},{geom_type=}")
+
     uri = geom_type  # TODO: URI MIGHT BE NONE?
-    if uri is None:
-        raise Exception(f"Could not load {geom.asJson()} as json")
 
     if name is None:
         name = DEFAULT_LAYER_NAME
@@ -235,11 +236,18 @@ def add_qgis_single_feature_layer(
     else:
         qgis_project = qgis_instance_handle
 
-    if geom_type == GeoJsonGeometryTypesEnum.geometry_collection.value.__name__:
+    if geom_type in (
+        QgsWkbTypes.GeometryCollection,
+        QgsWkbTypes.GeometryCollectionZ,
+        QgsWkbTypes.GeometryCollectionM,
+        QgsWkbTypes.GeometryCollectionZM,
+    ):
         for g in geom.asGeometryCollection():  # TODO: Look into recursion?
-            uri = json.loads(g.asJson())["type"]
-            if uri is None:
-                raise Exception(f"Could not load {g.asJson()} as json")
+            uri = QgsWkbTypes.translatedDisplayString(g.wkbType())
+
+            if True:
+                logger.error(f"{g},{uri=}")
+
             sub_type = uri  # TODO: URI MIGHT BE NONE?
 
             uri += "?"
@@ -402,6 +410,7 @@ def add_qgis_multi_feature_layer(
     group: Any = None,
     visible: bool = True,
     opacity: float = 1.0,
+    measurements: Optional[Iterable[Iterable[float]]] = None,
 ) -> Optional[List]:
     """
 
@@ -495,17 +504,16 @@ def add_qgis_multi_feature_layer(
 
     for geom in geoms:
         # geom:QgsGeometry
-        geom_json = json.loads(geom.asJson())
 
-        if geom_json is None:
+        from qgis.core import QgsWkbTypes
+
+        if geom.wkbType() == QgsWkbTypes.NoGeometry:
             continue
 
-        geom_type_ = geom_json["type"]
+        geom_type_ = QgsWkbTypes.translatedDisplayString(geom.wkbType())
 
-        assert geom_type_ is not None, f"could not read {geom_type_=} as json"
-
-        if geom_type_ is None:
-            raise Exception(f"Could not load {geom.asJson()} as json")
+        if True:
+            logger.error(f"{geom}, {geom_type_=}")
 
         if geom_type is None:
             geom_type = geom_type_
@@ -517,17 +525,30 @@ def add_qgis_multi_feature_layer(
             geom_type == geom_type_
         ), f"{geom_type_} is the not the same geometry type as {geom_type}"
 
-        if geom_type == GeoJsonGeometryTypesEnum.geometry_collection.value.__name__:
+        if geom_type in (  # TODO: VERIFY LOGIC!
+            QgsWkbTypes.GeometryCollection,
+            QgsWkbTypes.GeometryCollectionZ,
+            QgsWkbTypes.GeometryCollectionM,
+            QgsWkbTypes.GeometryCollectionZM,
+        ):
             for g in geom.asGeometryCollection():  # TODO: Look into recursion?
-                sub_type = json.loads(g.asJson())["type"]
-                if sub_type is None:
-                    raise Exception(f"Could not load {g.asJson()} as json")
 
-                # logger.info(f'Adding {sub_type=} of {geom=}')
+                sub_type = QgsWkbTypes.translatedDisplayString(g.wkbType())
 
                 return_collection.extend(
                     add_qgis_multi_feature_layer(
-                        qgis_instance_handle, g, f"{name}_{sub_type}"
+                        qgis_instance_handle,
+                        g,
+                        f"{name}_{sub_type}",
+                        crs=crs,
+                        columns=columns,
+                        categorise_by_attribute=categorise_by_attribute,
+                        color_generator=color_generator,
+                        index=index,
+                        group=group,
+                        visible=visible,
+                        opacity=opacity,
+                        measurements=measurements,  # TODO: THIS WILL BE WEIRD!
                     )
                 )
             return return_collection
@@ -674,7 +695,9 @@ def add_qgis_multi_feature_layer(
     return return_collection
 
 
-def solve_field_uri(field_type_configuration, fields, uri):
+def solve_field_uri(
+    field_type_configuration: Mapping, fields: Mapping, uri: str
+) -> str:
     uri = str(uri).rstrip("&")
     for k, v in fields.items():
         uri += f"&field={k}:{v}"
