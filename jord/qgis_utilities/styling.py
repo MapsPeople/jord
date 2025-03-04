@@ -20,7 +20,12 @@ from qgis.core import (
 )
 from warg import TripleNumber
 
-__all__ = ["style_layer_from_mapping", "set_3d_view_settings", "set_label_styling"]
+__all__ = [
+    "style_layer_from_mapping",
+    "set_3d_view_settings",
+    "set_label_styling",
+    "set_layer_rendering_scale",
+]
 
 from jord.qgis_utilities.enums import (
     Qgis3dAltitudeClamping,
@@ -83,12 +88,39 @@ def style_layer_from_mapping(
         layer.triggerRepaint()
 
 
+def set_layer_rendering_scale(
+    layers: QgsVectorLayer,
+    *,
+    max_ratio: float = 1.0,
+    min_ratio: float = 1 / 9999,
+):
+    """
+
+    :param layers:
+    :param max_ratio:
+    :param min_ratio:
+    :return:
+    """
+    if not isinstance(
+        layers, Iterable
+    ):  # Handle both single layer and iterable of layers
+        layers = [layers]
+
+    for layer in layers:
+        if not layer:
+            continue
+
+        layer.setScaleBasedVisibility(True)
+        layer.setMaximumScale(max_ratio)
+        layer.setMinimumScale(1 / min_ratio)
+
+
 def set_label_styling(
     layers: QgsVectorLayer,
     *,
     field_name: str = "name",
     max_ratio: float = 1.0,
-    min_ratio: float = 1 / 333,
+    min_ratio: float = 1 / 999,
     font_size: int = 10,
     background: bool = False,
     background_color: tuple = (255, 255, 255, 200),
@@ -143,25 +175,17 @@ def set_label_styling(
 
         label_settings.setFormat(format)
 
-        # Set scale-based visibility
         label_settings.scaleVisibility = True
         label_settings.maximumScale = max_ratio  # Closest zoom level
         label_settings.minimumScale = 1 / min_ratio  # Furthest zoom level
 
-        # Set placement
         label_settings.placement = QgsPalLayerSettings.AroundPoint
         label_settings.priority = 5
         label_settings.obstacleScale = 1.0
 
-        # Apply settings to layer
         layer_settings = QgsVectorLayerSimpleLabeling(label_settings)
         layer.setLabeling(layer_settings)
         layer.setLabelsEnabled(True)
-
-        # Set layer scale-based visibility
-        layer.setScaleBasedVisibility(True)
-        layer.setMaximumScale(max_ratio)
-        layer.setMinimumScale(1 / min_ratio)
 
 
 def make_line_symbol(
