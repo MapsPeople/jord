@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import logging
-from typing import Any, Iterable, Mapping
+from typing import Any, Iterable, Mapping, Optional
 
 # noinspection PyUnresolvedReferences
 from qgis.PyQt.QtGui import QColor
@@ -10,13 +10,17 @@ from qgis.PyQt.QtGui import QColor
 from qgis.core import (
     QgsCategorizedSymbolRenderer,
     QgsLineSymbol,
+    QgsPalLayerSettings,
     QgsRendererCategory,
     QgsSymbol,
+    QgsTextBackgroundSettings,
+    QgsTextFormat,
     QgsVectorLayer,
+    QgsVectorLayerSimpleLabeling,
 )
 from warg import TripleNumber
 
-__all__ = ["style_layer_from_mapping", "set_3d_view_settings"]
+__all__ = ["style_layer_from_mapping", "set_3d_view_settings", "set_label_styling"]
 
 from jord.qgis_utilities.enums import (
     Qgis3dAltitudeClamping,
@@ -77,6 +81,87 @@ def style_layer_from_mapping(
     layer.setRenderer(QgsCategorizedSymbolRenderer(field_name, render_categories))
     if repaint:
         layer.triggerRepaint()
+
+
+def set_label_styling(
+    layers: QgsVectorLayer,
+    *,
+    field_name: str = "name",
+    max_ratio: float = 1.0,
+    min_ratio: float = 1 / 333,
+    font_size: int = 10,
+    background: bool = False,
+    background_color: tuple = (255, 255, 255, 200),
+    background_svg: str = None,
+    html_format: Optional[str] = None,
+):
+    if layers is None:
+        return
+
+    # Handle both single layer and iterable of layers
+    if not isinstance(layers, Iterable):
+        layers = [layers]
+
+    for layer in layers:
+        if not layer:
+            continue
+
+        # Create label settings
+        label_settings = QgsPalLayerSettings()
+
+        # Set field name with optional HTML formatting
+        if html_format:  # ACTUALLY USE HTML
+            # label_settings.isExpression = True
+            label_settings.allowHtml = True
+            label_settings.fieldName = (
+                f"'<div style=\"text-align: center;\">' || {field_name} || '</div>'"
+            )
+        else:
+            label_settings.fieldName = field_name
+
+        # Set font settings
+        format = QgsTextFormat()
+        format.setSize(font_size)
+        format.setNamedStyle("Regular")
+        format.setColor(QColor(0, 0, 0))
+
+        # Set background if enabled
+        if background:
+            from qgis.PyQt.QtCore import QSizeF
+
+            bg_buffer = QgsTextBackgroundSettings()
+            bg_buffer.setEnabled(True)
+            bg_buffer.setFillColor(QColor(*background_color))
+            bg_buffer.setSize(QSizeF(1, 0.5))
+            bg_buffer.setType(QgsTextBackgroundSettings.ShapeRectangle)
+
+            if background_svg:
+                bg_buffer.setSvgFile(background_svg)
+                bg_buffer.setType(QgsTextBackgroundSettings.ShapeSVG)
+
+            format.setBackground(bg_buffer)
+
+        label_settings.setFormat(format)
+
+        # Set scale-based visibility
+        label_settings.scaleVisibility = True
+        label_settings.maximumScale = max_ratio  # Closest zoom level
+        label_settings.minimumScale = 1 / min_ratio  # Furthest zoom level
+
+        # Set placement
+        label_settings.placement = QgsPalLayerSettings.AroundPoint
+        label_settings.priority = 5
+        label_settings.obstacleScale = 1.0
+
+        # Apply settings to layer
+        layer_settings = QgsVectorLayerSimpleLabeling(label_settings)
+        layer.setLabeling(layer_settings)
+        layer.setLabelsEnabled(True)
+
+        # Set layer scale-based visibility
+        layer.setScaleBasedVisibility(True)
+        layer.setMaximumScale(max_ratio)
+        layer.setMinimumScale(1 / min_ratio)
 
 
 def make_line_symbol(
