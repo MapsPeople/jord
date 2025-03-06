@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 from enum import Enum
 from typing import Any
 
@@ -55,7 +54,8 @@ try:
 
         Qt.WindowModal
 
-        The window is modal to a single window hierarchy and blocks input to its parent window, all grandparent windows, and all siblings of its parent and grandparent windows.
+        The window is modal to a single window hierarchy and blocks input to its parent window, all grandparent
+        windows, and all siblings of its parent and grandparent windows.
 
         Qt.ApplicationModal
 

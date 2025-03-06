@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 from typing import Dict
 
 from jord.gdal_utilities import OGR

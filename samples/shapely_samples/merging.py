@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 def asudhua():
     from shapely.ops import polygonize, polygonize_full
 

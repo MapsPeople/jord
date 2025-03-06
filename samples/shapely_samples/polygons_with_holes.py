@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import geopandas
 from matplotlib import pyplot
 from shapely.geometry import Polygon

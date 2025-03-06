@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 from enum import Enum
 
 __all__ = ["CommonVectorDataProviderLibEnum"]
@@ -184,7 +182,8 @@ zmin
                 "",
                 "",
                 "Requires ArcGIS Onlinesubscription",
-                "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/%7Bz%7D/%7By%7D/%7Bx%7D",
+                "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places"
+                "/MapServer/tile/%7Bz%7D/%7By%7D/%7Bx%7D",
                 "",
                 "20",
                 "0",

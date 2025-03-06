@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 __all__ = ["load_spatialite"]
 
 import sqlite3

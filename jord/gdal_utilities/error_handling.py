@@ -1,9 +1,8 @@
-#!/usr/bin/env python3
 from enum import Enum
 
 from jord.gdal_utilities import GDAL
 
-__all__ = ["gdal_error_type_map"]
+__all__ = ["gdal_error_type_map", "GdalErrorTypeEnum", "gdal_error_handler"]
 
 
 class GdalErrorTypeEnum(Enum):

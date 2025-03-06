@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-
 from logging import warning
 from typing import Optional
 
@@ -52,7 +49,8 @@ def disconnect_signal(
                     # because it may have been connected multple times,
                     # and disconnect(slot) only removes one connection at a time.
                     signal.disconnect(old_handler)
-            else:  # disconnect all, only available when old_handler is None and we are debugging, as this is bad practice
+            else:  # disconnect all, only available when old_handler is None and we are debugging, as this is bad
+                # practice
                 if IS_DEBUGGING:
                     signal.disconnect()
         except TypeError:

@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 __author__ = "Christian Heider Lindbjerg"
 __doc__ = r"""
 
@@ -31,7 +29,8 @@ def install_requirements_from_file(requirements_path: Path) -> None:
     # pip.main(["install", "pip", "--upgrade"]) # REQUIRES RESTART OF QGIS
 
     args = ["install", "-r", str(requirements_path), "--upgrade"]
-    # args = ["install", "rasterio", "--upgrade"] # RASTERIO for window DOES NOT WORK ATM, should be installed manually
+    # args = ["install", "rasterio", "--upgrade"] # RASTERIO for window DOES NOT WORK ATM, should be installed
+    # manually
 
     if False:
         import pip

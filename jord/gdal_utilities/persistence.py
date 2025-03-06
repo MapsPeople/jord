@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
@@ -46,7 +45,8 @@ def create_ogr_table(
 
     :param spatialite_db: The spatialite_db to create table in
     :param table_name:
-    :param fields: A list of fields to create in the table. Each field is a tuple defined as ("column_name", Type)
+    :param fields: A list of fields to create in the table. Each field is a tuple defined as ("column_name",
+    Type)
     :param srs_id: Spatial reference system id of the geometries.
     :return:
     """

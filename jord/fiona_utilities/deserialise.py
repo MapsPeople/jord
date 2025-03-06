@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 __all__ = ["read_geometries"]
 
 from pathlib import Path

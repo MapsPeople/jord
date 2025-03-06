@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 __author__ = "Christian Heider Lindbjerg"
 __doc__ = r"""
 
@@ -42,7 +40,8 @@ def get_web_view(parent: Any) -> QWebView:
             <script>
             function initMap() {}
             </script>
-            <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD-9tCzsZ0-ZgK_ZgXZ-_XzQ_XzQ_XzQ_X&callback=initMap"
+            <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD-9tCzsZ0-ZgK_ZgXZ-_XzQ_XzQ_XzQ_X
+            &callback=initMap"
             async defer></script>
             </html>
             """

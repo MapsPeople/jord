@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import inspect
 from enum import Enum
 from typing import Callable

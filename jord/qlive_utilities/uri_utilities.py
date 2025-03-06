@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 __all__ = ["build_uri"]
 
 import json
