@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 
 def add_qgis_single_feature_layer(
-    qgis_instance_handle: Any,
+    qgis_instance_handle: Optional[Any],
     geom: Any,  #: QgsGeometry,
     name: Optional[str] = None,
     crs: Optional[str] = None,

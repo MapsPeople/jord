@@ -772,10 +772,10 @@ def add_rasters(qgis_instance_handle: Any, rasters: Mapping, *args, **kwargs) ->
 
 def add_no_geom_layer(
     qgis_instance_handle: Any,
-    name: Optional[Iterable[str]] = None,
     columns: Optional[
         Union[Mapping[str, Mapping[str, Any]], Iterable[Mapping[str, Any]]]
-    ] = None,
+    ],
+    name: Optional[Iterable[str]] = None,
     index: bool = False,
     group: Any = None,
     visible: bool = True,
@@ -788,14 +788,11 @@ def add_no_geom_layer(
 
     An example url is “Point?crs=epsg:4326&field=id:integer&field=name:string(20)&index=yes”
 
-    :param color_generator:
-    :param categorise_by_attribute:
+
     :param visible:
     :param group:
     :param qgis_instance_handle:
-    :param geoms:
     :param name:
-    :param crs:
     :param columns:
     :param index:
     :return:
