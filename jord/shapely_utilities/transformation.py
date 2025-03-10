@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 from typing import List, Iterable, Union, Tuple
 
 import numpy
@@ -48,7 +47,8 @@ def get_helmert_transformation_parameters(
 ) -> Tuple[numpy.ndarray, numpy.ndarray]:
     """
     # Calculate Helmert parameters for 2D transformation
-    # https://homepage.univie.ac.at/Wolfgang.Kainz/Lehrveranstaltungen/15th_Nordic_Summer_School/The_Mathematics_of_GIS_Draft.pdf
+    # https://homepage.univie.ac.at/Wolfgang.Kainz/Lehrveranstaltungen/15th_Nordic_Summer_School
+    /The_Mathematics_of_GIS_Draft.pdf
     # https://riptutorial.com/numpy/example/16034/find-the-least-squares-solution-to-a-linear-system-with-np-linalg-lstsq
 
     # Displacement lines have to from local coordinate system to Webmercator.

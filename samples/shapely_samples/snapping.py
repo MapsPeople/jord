@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 from shapely import LineString, Polygon
 from shapely.ops import snap
 

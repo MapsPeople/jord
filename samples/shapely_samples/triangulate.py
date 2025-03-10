@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 from shapely import MultiPoint
 from shapely.ops import triangulate
 

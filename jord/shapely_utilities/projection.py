@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 from typing import Iterable, Optional, Sequence, Tuple, Union
 
 import numpy

@@ -1,14 +1,9 @@
-#!/usr/bin/env python3
-
 from functools import partial
 from typing import Callable
 
-from jord.qlive_utilities import (
-    QliveClient,
-    QliveRPCMethodEnum,
-    QliveRPCMethodMap,
-    build_package,
-)
+from jord.qlive_utilities.client import QliveClient
+from jord.qlive_utilities.procedures import QliveRPCMethodEnum, QliveRPCMethodMap
+from jord.qlive_utilities.serialisation import build_package
 
 __doc__ = r"""Warning this client a no client-side validation, which might result in server-side exceptions"""
 
@@ -19,7 +14,8 @@ from jord.qlive_utilities.clients.arguments import partial_satisfied
 
 class AutoQliveClient(QliveClient):
     """
-    Has no client side validation of data, but exposes function if available in QliveRPCMethodEnum and QliveRPCMethodMap
+    Has no client side validation of data, but exposes function if available in QliveRPCMethodEnum and
+    QliveRPCMethodMap
     """
 
     def __init__(self, *args, **kwargs):

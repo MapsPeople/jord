@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 from typing import Any, Optional
 
-__all__ = ["setup_logger", "add_logging_handler_once"]
+__all__ = ["setup_logger", "add_logging_handler_once", "QgsLogHandler", "level_map"]
 
 level_map = {
     logging.NOTSET: 0,  # Qgis.MessageLevel.NoLevel

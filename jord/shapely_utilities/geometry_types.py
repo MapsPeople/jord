@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-
 from enum import Enum
 
 import shapely
@@ -23,7 +20,8 @@ class ShapelyGeometryTypesEnum(Enum):
     This enum is useful for exhaustively iterating possible shapely types.
     """
 
-    point = Point  # Point(*args) # A geometry type that represents a single coordinate with x,y and possibly z values.
+    point = Point  # Point(*args) # A geometry type that represents a single coordinate with x,y and possibly
+    # z values.
 
     line_string = LineString  # LineString([coordinates]) # A geometry type composed of one or more line segments.
 

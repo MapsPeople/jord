@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 from pathlib import Path
 
 from apppath import AppPath
@@ -25,7 +23,8 @@ if False:
     sys.path.append(str(qgis_sys_path))
     # C:\OSGeo4W\apps\qgis\python > qgis.pth
 
-# You can also set the environment variable QGIS_PLUGIN_PATH to another place but then all other plugins will be ignored
+# You can also set the environment variable QGIS_PLUGIN_PATH to another place but then all other plugins
+# will be ignored
 # QGIS_PLUGINPATH
 
 

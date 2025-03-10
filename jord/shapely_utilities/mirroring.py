@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 __all__ = ["reflection"]
 
 from numbers import Number
@@ -8,7 +6,6 @@ from typing import Callable
 from shapely.affinity import scale
 from shapely.geometry import Polygon
 from shapely.ops import transform
-
 
 # pts = numpy.array([[0, 0], [1, 1], [1, 2], [0, 1]])
 # display(Polygon(pts.dot([[1,0],[0,-1]])))

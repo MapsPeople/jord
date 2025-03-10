@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 from osgeo import osr
 
 __all__ = ["get_spatial_reference_from_epsg"]

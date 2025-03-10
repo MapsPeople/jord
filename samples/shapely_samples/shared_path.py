@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 from shapely import LineString
 from shapely.ops import shared_paths
 

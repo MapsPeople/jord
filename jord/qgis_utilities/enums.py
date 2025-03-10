@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 from enum import Enum
 
 from qgis._3d import Qgs3DTypes

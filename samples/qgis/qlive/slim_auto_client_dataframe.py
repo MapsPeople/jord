@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 from geopandas import GeoSeries
 from pandas import DataFrame
 

@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 from geopandas import GeoDataFrame, GeoSeries
 
 from jord.qlive_utilities.clients.auto import AutoQliveClient

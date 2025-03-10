@@ -1,9 +1,8 @@
-#!/usr/bin/env python3
 import base64
 import json
 import pickle
 from enum import Enum
-from typing import Tuple, Sequence, Any, Callable, Mapping, Union
+from typing import Any, Callable, Mapping, Sequence, Tuple, Union
 
 __all__ = ["build_package", "read_package"]
 
@@ -22,7 +21,7 @@ VERBOSE = False
 
 def build_package(
     method: QliveRPCMethodEnum, *args: Any, **kwargs
-) -> Union[bytes, str]:
+) -> Union[bytes, str, None]:
     """
 
     :param method:
@@ -64,7 +63,8 @@ def read_package(package: bytes) -> Tuple[Callable, Sequence[Any], Mapping[str, 
             base64.b64decode(package)
             .decode("ascii")
             .replace(
-                # Json library convert string dictionary to real dictionary type. Double quotes is standard format for json
+                # Json library convert string dictionary to real dictionary type. Double quotes is standard
+                # format for json
                 "'",
                 '"',
             )

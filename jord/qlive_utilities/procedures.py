@@ -1,9 +1,8 @@
-#!/usr/bin/env python3
 import logging
 import time
 import uuid
 from enum import Enum
-from typing import Any, Iterable, List, Mapping, Tuple
+from typing import Any, Iterable, List, Mapping, Optional, Tuple, Union
 
 import numpy
 import shapely.geometry.base
@@ -13,13 +12,14 @@ from shapely.geometry.base import BaseGeometry
 from warg import Number, ensure_existence, passes_kws_to
 
 from jord import PROJECT_APP_PATH
-from jord.qgis_utilities import (
-    wkb_geom_constructor,
-)
-from jord.qgis_utilities.layer_creation import (
+from .layer_creation import (
     add_qgis_multi_feature_layer,
     add_qgis_single_feature_layer,
+    solve_field_uri,
+    to_string_if_not_of_exact_type,
 )
+from .parsing import wkb_geom_constructor
+from .type_solving import solve_type, solve_type_configuration
 
 APPEND_TIMESTAMP = True
 SKIP_MEMORY_LAYER_CHECK_AT_CLOSE = True
@@ -49,6 +49,7 @@ __all__ = [
     "add_shapely_geometry",
     "add_shapely_geometries",
     "add_shapely_layer",
+    "add_no_geom_layer",
     "clear_all",
     "remove_layers",
     "remove_layer",
@@ -769,6 +770,160 @@ def add_rasters(qgis_instance_handle: Any, rasters: Mapping, *args, **kwargs) ->
     return return_list
 
 
+def add_no_geom_layer(
+    qgis_instance_handle: Any,
+    columns: Optional[
+        Union[Mapping[str, Mapping[str, Any]], Iterable[Mapping[str, Any]]]
+    ],
+    name: Optional[Iterable[str]] = None,
+    index: bool = False,
+    group: Any = None,
+    visible: bool = True,
+) -> Optional[List]:
+    """
+
+        fields  == column definition name, type, length/size
+        Multiple field parameters can be added to the data provider definition. type is one of “integer”,
+        “double”, “string”.
+
+    An example url is “Point?crs=epsg:4326&field=id:integer&field=name:string(20)&index=yes”
+
+
+    :param visible:
+    :param group:
+    :param qgis_instance_handle:
+    :param name:
+    :param columns:
+    :param index:
+    :return:
+    """
+
+    # noinspection PyUnresolvedReferences
+    from qgis.core import QgsFeature, QgsVectorLayer, QgsProject, QgsFeatureSink
+
+    # noinspection PyUnresolvedReferences
+    import qgis
+
+    return_collection = []
+
+    if name is None:
+        name = DEFAULT_LAYER_NAME
+
+    crs = None
+    if crs is None:
+        crs = DEFAULT_LAYER_CRS
+
+    layer_name = f"{name}"
+    if APPEND_TIMESTAMP:
+        layer_name += f"_{time.time()}"
+
+    uri = "None"
+
+    sample_row = None
+    num_cols = None
+    attr_generator = None
+    fields = None
+    field_type_configuration = None
+
+    if columns and len(columns):  # TODO: FIND MAX LENGTH STR
+        if isinstance(columns, Mapping):
+            sample_row = next(iter(columns.values()), None)
+            # TODO: Might not be ordered correctly
+            # if isinstance(next(iter(columns.values())), Mapping):
+            #    ...
+            attr_generator = iter(columns.values())
+        elif isinstance(columns, Iterable):
+            sample_row = next(iter(columns), None)
+            # TODO: Might not be ordered correctly
+            # if isinstance(next(iter(columns.values())), Mapping):
+            #    ...
+            attr_generator = iter(columns)
+
+        assert isinstance(sample_row, Mapping)
+
+    if sample_row:
+        fields = {k: solve_type(v) for k, v in sample_row.items()}
+        field_type_configuration = {
+            k: solve_type_configuration(v, k, columns) for k, v in sample_row.items()
+        }
+        num_cols = len(sample_row)
+
+    features = []
+    for row in attr_generator:
+        if row:
+            feat = QgsFeature()
+            feat.initAttributes(num_cols)
+            feat.setAttributes(list(to_string_if_not_of_exact_type(row.values())))
+
+            assert feat.isValid(), f"{feat} was invalid"
+            features.append(feat)
+
+    uri += "?"
+
+    if crs:
+        uri += f"crs={crs}"
+
+    if fields:  # field=name:type(length,precision)
+        uri = solve_field_uri(field_type_configuration, fields, uri)
+
+    uri = str(uri).rstrip("&")
+    uri += f'&index={"yes" if index else "no"}'
+    uri.replace("?&", "?")
+
+    layer = QgsVectorLayer(uri, layer_name, "memory")
+    layer_data_provider = layer.dataProvider()
+    # pr.addAttributes([QgsField("name", QVariant.String),QgsField("age", QVariant.Int),QgsField("size",
+    # QVariant.Double)])
+
+    (res, out_feats) = layer_data_provider.addFeatures(
+        features
+        # , QgsFeatureSink.RollBackOnErrors
+    )
+
+    if not res:
+        logger.error(f"{layer_data_provider.lastError()}")
+
+        assert (
+            res
+        ), f"Failure while adding features {res} {layer_data_provider.lastError()}"
+
+    layer_data_provider.updateExtents()
+
+    if SKIP_MEMORY_LAYER_CHECK_AT_CLOSE:
+        layer.setCustomProperty("skipMemoryLayersCheck", 1)
+
+    layer.commitChanges()
+    layer.updateFields()
+    layer.updateExtents()
+
+    if qgis_instance_handle is None:
+        qgis_project = QgsProject.instance()
+    elif not isinstance(qgis_instance_handle, QgsProject):
+        qgis_project = qgis_instance_handle.qgis_project
+    else:
+        qgis_project = qgis_instance_handle
+
+    if group:
+        qgis_project.addMapLayer(layer, False)
+        group.insertLayer(0, layer)
+    else:
+        qgis_project.addMapLayer(layer)
+
+    layer_tree_handle = qgis_project.layerTreeRoot().findLayer(layer.id())
+    if layer_tree_handle:
+        layer_tree_handle.setItemVisibilityChecked(visible)
+
+    actions = qgis.utils.iface.layerTreeView().defaultActions()
+    actions.showFeatureCount()  # TODO: Twice?
+    actions.showFeatureCount()
+
+    return_collection.append(layer)
+
+    assert len(return_collection) > 0, f"Return collection was empty"
+
+    return return_collection
+
+
 class QliveRPCMethodEnum(Enum):
     # add_layers = add_layers.__name__
 
@@ -798,6 +953,8 @@ class QliveRPCMethodEnum(Enum):
 
     add_raster = add_raster.__name__
     add_rasters = add_rasters.__name__
+
+    add_no_geom_layer = add_no_geom_layer.__name__
 
 
 funcs = locals()  # In local scope for name

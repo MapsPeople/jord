@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 __author__ = "Christian Heider Lindbjerg"
 __doc__ = r"""
 
@@ -78,6 +76,7 @@ def make_dialog_progress_bar(
 
 
 class DialogProgressBar(AlsoDecorator):  # TODO This freezes!
+
     # TODO Make it formatable with a unit or a title
     # self.progressBar.setFormat(f"{hms} - %p%")
     @passes_kws_to(make_dialog_progress_bar)
@@ -98,6 +97,7 @@ class DialogProgressBar(AlsoDecorator):  # TODO This freezes!
 
 
 class InjectedProgressBar(AlsoDecorator):
+
     @passes_kws_to(make_progress_bar)
     def __init__(self, **kwargs):
         self._parent = kwargs.pop("parent", None)

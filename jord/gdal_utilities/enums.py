@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 __author__ = "heider"
 __doc__ = r"""
 
@@ -10,7 +8,7 @@ from enum import Enum
 
 from jord.gdal_utilities.importing import GDAL
 
-__all__ = ["GDAL"]
+__all__ = ["GdalAccessEnum"]
 
 
 class GdalAccessEnum(Enum):

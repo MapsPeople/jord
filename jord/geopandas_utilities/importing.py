@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import os
 
 os.environ["USE_PYGEOS"] = "0"

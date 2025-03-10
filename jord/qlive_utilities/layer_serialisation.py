@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 from typing import Any
 
 APPEND_TIMESTAMP = True
@@ -89,7 +88,8 @@ def serialise_qgis_layer(qgis_instance_handle: Any, layer: Any) -> None:
     # geom_geojson_rep = layer.asJson(precision=17)
     layer_geojson_rep = QgsJsonExporter(
         layer, precision=17
-    )  # Note that geometries will be automatically reprojected to WGS84 to match GeoJSON spec if either the source vector layer or source CRS is set.
+    )  # Note that geometries will be automatically reprojected to WGS84 to match GeoJSON spec if either
+    # the source vector layer or source CRS is set.
 
     return layer_geojson_rep
 

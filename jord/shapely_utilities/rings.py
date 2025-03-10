@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import shapely
 
 from shapely import LinearRing

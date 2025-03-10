@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import numpy
 
 from jord.qlive_utilities.clients.auto import AutoQliveClient
