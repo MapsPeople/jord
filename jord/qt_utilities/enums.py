@@ -112,7 +112,8 @@ except:
         """
 
         PySide2.QtCore.Qt.WindowModality¶
-        This enum specifies the behavior of a modal window. A modal window is one that blocks input to other windows. Note that windows that are children of a modal window are not blocked.
+        This enum specifies the behavior of a modal window. A modal window is one that blocks input to other
+        windows. Note that windows that are children of a modal window are not blocked.
 
         The values are:
 
@@ -126,7 +127,8 @@ except:
 
         Qt.WindowModal
 
-        The window is modal to a single window hierarchy and blocks input to its parent window, all grandparent windows, and all siblings of its parent and grandparent windows.
+        The window is modal to a single window hierarchy and blocks input to its parent window, all grandparent
+        windows, and all siblings of its parent and grandparent windows.
 
         Qt.ApplicationModal
 
@@ -179,7 +181,9 @@ class DropActionFlag(Enum):
     Qt::LinkAction	0x4	Create a link from the source to the target.
     Qt::ActionMask	0xff
     Qt::IgnoreAction	0x0	Ignore the action (do nothing with the data).
-    Qt::TargetMoveAction	0x8002	On Windows, this value is used when the ownership of the D&D data should be taken over by the target application, i.e., the source application should not delete the data. On X11 this value is used to do a move. TargetMoveAction is not used on the Mac.
+    Qt::TargetMoveAction	0x8002	On Windows, this value is used when the ownership of the D&D data should be
+    taken over by the target application, i.e., the source application should not delete the data. On X11 this
+    value is used to do a move. TargetMoveAction is not used on the Mac.
 
     """
 
@@ -198,20 +202,24 @@ class FocusPolicyFlag(Enum):
     """
       Qt::TabFocus	0x1	the widget accepts focus by tabbing.
     Qt::ClickFocus	0x2	the widget accepts focus by clicking.
-    Qt::StrongFocus	TabFocus | ClickFocus | 0x8	the widget accepts focus by both tabbing and clicking. On macOS this will also be indicate that the widget accepts tab focus when in 'Text/List focus mode'.
-    Qt::WheelFocus	StrongFocus | 0x4	like Qt::StrongFocus plus the widget accepts focus by using the mouse wheel.
+    Qt::StrongFocus	TabFocus | ClickFocus | 0x8	the widget accepts focus by both tabbing and clicking. On macOS
+    this will also be indicate that the widget accepts tab focus when in 'Text/List focus mode'.
+    Qt::WheelFocus	StrongFocus | 0x4	like Qt::StrongFocus plus the widget accepts focus by using the mouse
+    wheel.
     Qt::NoFocus	0	the widget does not accept focus.
     """
 
 
 class FocusReasonEnum(Enum):
     """
-      This enum specifies why the focus changed. It will be passed through QWidget::setFocus and can be retrieved in the QFocusEvent sent to the widget upon focus change.
+      This enum specifies why the focus changed. It will be passed through QWidget::setFocus and can be
+      retrieved in the QFocusEvent sent to the widget upon focus change.
 
     Constant	Value	Description
     Qt::MouseFocusReason	0	A mouse action occurred.
     Qt::TabFocusReason	1	The Tab key was pressed.
-    Qt::BacktabFocusReason	2	A Backtab occurred. The input for this may include the Shift or Control keys; e.g. Shift+Tab.
+    Qt::BacktabFocusReason	2	A Backtab occurred. The input for this may include the Shift or Control keys;
+    e.g. Shift+Tab.
     Qt::ActiveWindowFocusReason	3	The window system made this window either active or inactive.
     Qt::PopupFocusReason	4	The application opened/closed a pop-up that grabbed/released the keyboard focus.
     Qt::ShortcutFocusReason	5	The user typed a label's buddy shortcut
@@ -264,7 +272,8 @@ class KeyEnum(Enum):
     Qt::Key_Pause	0x01000008	The Pause/Break key (Note: Not related to pausing media)
     Qt::Key_Print	0x01000009
     Qt::Key_SysReq	0x0100000a
-    Qt::Key_Clear	0x0100000b	Corresponds to the Clear key on selected Apple keyboard models. On other systems it is commonly mapped to the numeric keypad key 5, when Num Lock is off.
+    Qt::Key_Clear	0x0100000b	Corresponds to the Clear key on selected Apple keyboard models. On other systems
+    it is commonly mapped to the numeric keypad key 5, when Num Lock is off.
     Qt::Key_Home	0x01000010
     Qt::Key_End	0x01000011
     Qt::Key_Left	0x01000012
@@ -275,9 +284,11 @@ class KeyEnum(Enum):
     Qt::Key_PageDown	0x01000017
     Qt::Key_Shift	0x01000020
     Qt::Key_Control	0x01000021	On macOS, this corresponds to the Command keys.
-    Qt::Key_Meta	0x01000022	On macOS, this corresponds to the Control keys. On Windows keyboards, this key is mapped to the Windows key.
+    Qt::Key_Meta	0x01000022	On macOS, this corresponds to the Control keys. On Windows keyboards, this key is
+    mapped to the Windows key.
     Qt::Key_Alt	0x01000023
-    Qt::Key_AltGr	0x01001103	On Windows, when the KeyDown event for this key is sent, the Ctrl+Alt modifiers are also set.
+    Qt::Key_AltGr	0x01001103	On Windows, when the KeyDown event for this key is sent, the Ctrl+Alt modifiers
+    are also set.
     Qt::Key_CapsLock	0x01000024
     Qt::Key_NumLock	0x01000025
     Qt::Key_ScrollLock	0x01000026
@@ -559,8 +570,10 @@ class KeyEnum(Enum):
     Qt::Key_MediaPrevious	0x01000082
     Qt::Key_MediaNext	0x01000083
     Qt::Key_MediaRecord	0x01000084
-    Qt::Key_MediaPause	0x01000085	A key setting the state of the media player to pause (Note: not the pause/break key)
-    Qt::Key_MediaTogglePlayPause	0x01000086	A key to toggle the play/pause state in the media player (rather than setting an absolute state)
+    Qt::Key_MediaPause	0x01000085	A key setting the state of the media player to pause (Note: not the
+    pause/break key)
+    Qt::Key_MediaTogglePlayPause	0x01000086	A key to toggle the play/pause state in the media player (rather
+    than setting an absolute state)
     Qt::Key_HomePage	0x01000090
     Qt::Key_Favorites	0x01000091
     Qt::Key_Search	0x01000092
@@ -700,19 +713,24 @@ class KeyEnum(Enum):
     Qt::Key_Redo	0x01000124
     Qt::Key_MediaLast	0x0100ffff
     Qt::Key_unknown	0x01ffffff
-    Qt::Key_Call	0x01100004	A key to answer or initiate a call (see Qt::Key_ToggleCallHangup for a key to toggle current call state)
-    Qt::Key_Camera	0x01100020	A key to activate the camera shutter. On Windows Runtime, the environment variable QT_QPA_ENABLE_CAMERA_KEYS must be set to receive the event.
-    Qt::Key_CameraFocus	0x01100021	A key to focus the camera. On Windows Runtime, the environment variable QT_QPA_ENABLE_CAMERA_KEYS must be set to receive the event.
+    Qt::Key_Call	0x01100004	A key to answer or initiate a call (see Qt::Key_ToggleCallHangup for a key to
+    toggle current call state)
+    Qt::Key_Camera	0x01100020	A key to activate the camera shutter. On Windows Runtime, the environment
+    variable QT_QPA_ENABLE_CAMERA_KEYS must be set to receive the event.
+    Qt::Key_CameraFocus	0x01100021	A key to focus the camera. On Windows Runtime, the environment variable
+    QT_QPA_ENABLE_CAMERA_KEYS must be set to receive the event.
     Qt::Key_Context1	0x01100000
     Qt::Key_Context2	0x01100001
     Qt::Key_Context3	0x01100002
     Qt::Key_Context4	0x01100003
     Qt::Key_Flip	0x01100006
-    Qt::Key_Hangup	0x01100005	A key to end an ongoing call (see Qt::Key_ToggleCallHangup for a key to toggle current call state)
+    Qt::Key_Hangup	0x01100005	A key to end an ongoing call (see Qt::Key_ToggleCallHangup for a key to toggle
+    current call state)
     Qt::Key_No	0x01010002
     Qt::Key_Select	0x01010000
     Qt::Key_Yes	0x01010001
-    Qt::Key_ToggleCallHangup	0x01100007	A key to toggle the current call state (ie. either answer, or hangup) depending on current call state
+    Qt::Key_ToggleCallHangup	0x01100007	A key to toggle the current call state (ie. either answer, or hangup)
+    depending on current call state
     Qt::Key_VoiceDial	0x01100008
     Qt::Key_LastNumberRedial	0x01100009
     Qt::Key_Execute	0x01020003

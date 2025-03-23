@@ -128,7 +128,7 @@ def add_dropdown_widget(layers: Any, field_name: str, form_widget: Any) -> None:
 
 
 def make_field_unique(
-    layers: Sequence[Any], field_name: str = "admin_id", auto_generate: bool = True
+    layers: Sequence[Any], *, field_name: str = "id", auto_generate: bool = True
 ) -> None:
     if layers is None:
         return

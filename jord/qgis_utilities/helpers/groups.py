@@ -65,6 +65,7 @@ def duplicate_groups(
 def duplicate_tree_node(new_group_parent: Any, original_group_child: Any) -> Any:
     original_layer = original_group_child.layer()
     new_layer_copy = deepcopy_layer(original_layer)
+
     QgsProject.instance().addMapLayer(new_layer_copy, False)
 
     if False:
@@ -91,7 +92,8 @@ def duplicate_tree_node(new_group_parent: Any, original_group_child: Any) -> Any
             new_layer_copy.providerType(),
         )
     elif True:
-        new_group_parent.insertLayer(0, new_layer_copy)
+        new_layer_node = new_group_parent.insertLayer(0, new_layer_copy)
+        new_layer_node.setItemVisibilityChecked(original_group_child.isVisible())
     else:
         raise Exception()
 
