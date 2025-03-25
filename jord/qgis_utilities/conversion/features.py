@@ -79,15 +79,17 @@ def layer_data_generator(layer_tree_layer: Any) -> Tuple:
 
 def feature_to_shapely(
     layer_feature: Any,
+    validate: bool = True,
 ) -> Optional[shapely.geometry.base.BaseGeometry]:
     """
 
+    :param validate:
     :param layer_feature:
     :return:
     """
     feature_geom = layer_feature.geometry()
     if feature_geom is not None:
-        if True:
+        if validate:
             if not feature_geom.isGeosValid():
                 msg = (
                     f"{layer_feature.id()=} is not a valid geometry, {feature_geom.lastError()}\n"
@@ -99,12 +101,16 @@ def feature_to_shapely(
                 elif False:
                     feature_geom = feature_geom.makeValid()
 
-        if True:
+        if validate:
             if feature_geom.isNull() or feature_geom.isEmpty():
                 raise GeometryIsEmptyError(f"{layer_feature.id()=} is empty")
+        else:
+            if feature_geom.isNull() or feature_geom.isEmpty():
+                return None
 
         geom_wkb = feature_geom.asWkb()
         if geom_wkb is not None:
             if not isinstance(geom_wkb, bytes):
                 geom_wkb = bytes(geom_wkb)
+
             return shapely.from_wkb(geom_wkb)

@@ -49,8 +49,8 @@ def assertive_add_edge(
         if u == v:
             raise IllegalLoopException(f"{u} == {v}")
 
-    assert isinstance(u, int)
-    assert isinstance(v, int)
+    assert isinstance(u, int), f"{u=} is not int, but {type(u)=}"
+    assert isinstance(v, int), f"{v=} is not int, but {type(v)=}"
 
     assert graph.has_node(u)
     assert graph.has_node(v)
