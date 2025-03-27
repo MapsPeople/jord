@@ -7,7 +7,12 @@ from qgis.core import QgsLayerTreeGroup, QgsLayerTreeLayer, QgsProject
 # noinspection PyUnresolvedReferences
 from qgis.utils import iface
 
-__all__ = ["duplicate_groups", "select_layer_in_group", "is_group_selected"]
+__all__ = [
+    "duplicate_groups",
+    "select_layer_in_group",
+    "is_group_selected",
+    "duplicate_tree_node",
+]
 
 from jord.qgis_utilities.helpers.copying import deepcopy_layer
 
@@ -62,9 +67,14 @@ def duplicate_groups(
     return new_group_parent, sub_items
 
 
-def duplicate_tree_node(new_group_parent: Any, original_group_child: Any) -> Any:
+def duplicate_tree_node(
+    new_group_parent: Any, original_group_child: Any, new_name: Optional[str] = None
+) -> Any:
     original_layer = original_group_child.layer()
     new_layer_copy = deepcopy_layer(original_layer)
+
+    if new_name is not None:
+        new_layer_copy.setName(new_name)
 
     QgsProject.instance().addMapLayer(new_layer_copy, False)
 
