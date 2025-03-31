@@ -1,9 +1,17 @@
 import logging
-from enum import Enum
+from enum import Enum, IntEnum
 from typing import Any, Iterable, Mapping, Sequence, Type
 
 # noinspection PyUnresolvedReferences
-from qgis.core import QgsDefaultValue, QgsEditorWidgetSetup, QgsFieldConstraints
+from qgis.core import (
+    QgsDefaultValue,
+    QgsDefaultValue,
+    QgsEditorWidgetSetup,
+    QgsEditorWidgetSetup,
+    QgsFieldConstraints,
+    QgsFieldConstraints,
+    QgsMapLayer,
+)
 
 __all__ = [
     "set_field_widget",
@@ -19,7 +27,25 @@ __all__ = [
     "make_mapping_dropdown_widget",
     "field_to_datetime",
     "field_readonly",
+    "make_external_resource_widget",
 ]
+
+
+class DocumentViewerEnum(IntEnum):
+    no_content = 0
+    image = 1
+    audio = 2
+    video = 3
+    web_view = 4
+
+
+AUTO = 0
+
+ABSOLUTE = 0
+RELATIVE = 1
+
+FILE_PATHS = 0
+DIRECTORY_PATHS = 1
 
 IGNORE_THIS_STRING = """
 
@@ -363,11 +389,11 @@ def make_iterable_dropdown_widget(it: Iterable) -> Any:
 def make_value_relation_widget(
     target_layer_id: str,
     *,
-    target_key_field_name: str = "admin_id",
+    target_key_field_name: str = "key",
     target_value_field_name: str = "name",
     use_completer: bool = False,
     order_by_value: bool = False,
-    allow_null_value: bool = False,
+    allow_null_values: bool = False,
     allow_multiple_values: bool = False
 ) -> Any:
     """
@@ -403,7 +429,7 @@ def make_value_relation_widget(
     :param target_value_field_name:
     :param use_completer:
     :param order_by_value:
-    :param allow_null_value:
+    :param allow_null_values:
     :param allow_multiple_values:
     :return:
     """
@@ -412,7 +438,7 @@ def make_value_relation_widget(
         "ValueRelation",
         {
             "AllowMulti": allow_multiple_values,
-            "AllowNull": allow_null_value,
+            "AllowNull": allow_null_values,
             "FilterExpression": "",
             "Key": target_key_field_name,
             "Layer": target_layer_id,
@@ -443,14 +469,6 @@ def field_to_datetime(layer, field_name):
 
 
 def field_readonly(layer, fieldname, option=True):
-    # noinspection PyUnresolvedReferences
-    from qgis.core import (
-        QgsDefaultValue,
-        QgsEditorWidgetSetup,
-        QgsFieldConstraints,
-        QgsMapLayer,
-    )
-
     if layer.type() != QgsMapLayer.VectorLayer:
         return
 
@@ -460,3 +478,62 @@ def field_readonly(layer, fieldname, option=True):
         form_config = layer.editFormConfig()
         form_config.setReadOnly(field_idx, option)
         layer.setEditFormConfig(form_config)
+
+
+def make_external_resource_widget(
+    document_viewer: DocumentViewerEnum = DocumentViewerEnum.image,
+    document_viewer_width: int = AUTO,
+    document_viewer_height: int = AUTO,
+):
+    """
+
+
+    <editWidget type="ExternalResource">
+          <config>
+            <Option type="Map">
+              <Option name="DocumentViewer" type="int" value="0"/>
+              <Option name="DocumentViewerHeight" type="int" value="0"/>
+              <Option name="DocumentViewerWidth" type="int" value="0"/>
+              <Option name="FileWidget" type="bool" value="true"/>
+              <Option name="FileWidgetButton" type="bool" value="true"/>
+              <Option name="FileWidgetFilter" type="QString" value=""/>
+              <Option name="PropertyCollection" type="Map">
+                <Option name="name" type="QString" value=""/>
+                <Option name="properties"/>
+                <Option name="type" type="QString" value="collection"/>
+              </Option>
+              <Option name="RelativeStorage" type="int" value="0"/>
+              <Option name="StorageAuthConfigId" type="QString" value=""/>
+              <Option name="StorageMode" type="int" value="0"/>
+              <Option name="StorageType" type="QString" value=""/>
+            </Option>
+          </config>
+        </editWidget>
+
+    :param document_viewer:
+    :param document_viewer_width:
+    :param document_viewer_height:
+    :return:
+    """
+
+    return QgsEditorWidgetSetup(
+        "ExternalResource",
+        {
+            "FileWidget": True,
+            "FileWidgetButton": True,
+            "FileWidgetFilter": "",
+            "DocumentViewer": document_viewer.value,
+            "DocumentViewerHeight": document_viewer_height,
+            "DocumentViewerWidth": document_viewer_width,
+            "RelativeStorage": ABSOLUTE,
+            "StorageMode": FILE_PATHS,
+        },
+    )
+
+
+IGNORE_THIS_STRING3 = """
+
+ews = layer.editorWidgetSetup(field_index)
+print("Type:", ews.type())
+print("Config:", ews.config())
+"""

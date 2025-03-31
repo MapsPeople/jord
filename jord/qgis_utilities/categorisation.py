@@ -2,6 +2,20 @@ import random
 from itertools import cycle
 from typing import Callable, Generator, Iterable, Sized
 
+# noinspection PyUnresolvedReferences
+from qgis.PyQt.QtGui import QColor
+
+# noinspection PyUnresolvedReferences
+from qgis.core import (
+    QgsCategorizedSymbolRenderer,
+    QgsRendererCategory,
+    QgsSimpleFillSymbolLayer,
+    QgsSymbol,
+    QgsVectorLayer,
+)
+
+# noinspection PyUnresolvedReferences
+from qgis.utils import iface
 from warg import QuadNumber, TripleNumber, n_uint_mix_generator_builder
 
 __all__ = [
@@ -36,22 +50,6 @@ def random_color_generator() -> Generator[TripleNumber, None, None]:
 def random_color_alpha_generator() -> Generator[QuadNumber, None, None]:
     while 1:
         yield random_rgba()
-
-
-# noinspection PyUnresolvedReferences
-from qgis.PyQt.QtGui import QColor
-
-# noinspection PyUnresolvedReferences
-from qgis.core import (
-    QgsCategorizedSymbolRenderer,
-    QgsRendererCategory,
-    QgsSimpleFillSymbolLayer,
-    QgsSymbol,
-    QgsVectorLayer,
-)
-
-# noinspection PyUnresolvedReferences
-from qgis.utils import iface
 
 
 def categorise_layer(

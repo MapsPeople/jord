@@ -1,10 +1,17 @@
 import logging
 import time
-from typing import Any, Collection, Iterable, List, Mapping, Optional, Union
+from itertools import tee
+from typing import Any, Iterable, List, Mapping, Optional, Union
 
 from warg import n_uint_mix_generator_builder, passes_kws_to
 
-from jord.qlive_utilities.type_solving import solve_type, solve_type_configuration
+from jord.typing_utilities.type_solving import (
+    solve_attribute_uri,
+    solve_field_uri,
+    solve_qgis_type,
+    solve_type_configuration,
+    to_string_if_not_of_exact_type,
+)
 
 APPEND_TIMESTAMP = True
 SKIP_MEMORY_LAYER_CHECK_AT_CLOSE = True
@@ -21,7 +28,6 @@ __all__ = [
     "add_qgis_single_feature_layer",
     "add_qgis_single_geometry_layers",
     "add_qgis_multi_feature_layer",
-    "solve_field_uri",
 ]
 
 logger = logging.getLogger(__name__)
@@ -61,6 +67,7 @@ def add_qgis_single_feature_layer(
     :type name: Optional[str]
     :param crs: Crs=definition Defines the coordinate reference system to use for the layer. Definition is any
     string accepted by QgsCoordinateReferenceSystem.createFromString()
+    :param measurements: UNUSED!
     :return: None
     :rtype: None
     """
@@ -71,6 +78,7 @@ def add_qgis_single_feature_layer(
         QgsVectorLayer,
         QgsRasterLayer,
         QgsProject,
+        QgsWkbTypes,
     )
     from jord.qgis_utilities.categorisation import categorise_layer
 
@@ -82,8 +90,6 @@ def add_qgis_single_feature_layer(
     # uri = geom.wktTypeStr()
 
     return_collection = []
-
-    from qgis.core import QgsWkbTypes
 
     if geom.wkbType() == QgsWkbTypes.NoGeometry:
         return return_collection
@@ -106,7 +112,7 @@ def add_qgis_single_feature_layer(
         layer_name += f"_{time.time()}"
 
     if columns:
-        fields = {k: solve_type(v) for k, v in columns}
+        fields = {k: solve_qgis_type(v) for k, v in columns}
         field_type_configuration = {
             k: solve_type_configuration(v, k, columns) for k, v in columns.items()
         }
@@ -317,6 +323,7 @@ def add_qgis_multi_feature_layer(
 
     An example url is “Point?crs=epsg:4326&field=id:integer&field=name:string(20)&index=yes”
 
+    :param measurements: UNUSED!
     :param opacity:
     :param color_generator:
     :param categorise_by_attribute:
@@ -334,7 +341,13 @@ def add_qgis_multi_feature_layer(
     from jord.qgis_utilities.categorisation import categorise_layer
 
     # noinspection PyUnresolvedReferences
-    from qgis.core import QgsFeature, QgsVectorLayer, QgsProject, QgsFeatureSink
+    from qgis.core import (
+        QgsFeature,
+        QgsVectorLayer,
+        QgsProject,
+        QgsFeatureSink,
+        QgsWkbTypes,
+    )
 
     # noinspection PyUnresolvedReferences
     import qgis
@@ -358,7 +371,6 @@ def add_qgis_multi_feature_layer(
     geom_type = None
     uri = None
 
-    sample_row = None
     num_cols = None
     attr_generator = None
     fields = None
@@ -366,26 +378,15 @@ def add_qgis_multi_feature_layer(
 
     if columns and len(columns):  # TODO: FIND MAX LENGTH STR
         if isinstance(columns, Mapping):
-            sample_row = next(iter(columns.values()), None)
-            # TODO: Might not be ordered correctly
-            # if isinstance(next(iter(columns.values())), Mapping):
-            #    ...
-            attr_generator = iter(columns.values())
+            attr_generator, attr_type_sampler = tee(iter(columns.values()))
         elif isinstance(columns, Iterable):
-            sample_row = next(iter(columns), None)
-            # TODO: Might not be ordered correctly
-            # if isinstance(next(iter(columns.values())), Mapping):
-            #    ...
-            attr_generator = iter(columns)
+            attr_generator, attr_type_sampler = tee(iter(columns))
+        else:
+            raise TypeError(f"columns must be a mapping or an iterable of mappings")
 
-        assert isinstance(sample_row, Mapping)
-
-    if sample_row:
-        fields = {k: solve_type(v) for k, v in sample_row.items()}
-        field_type_configuration = {
-            k: solve_type_configuration(v, k, columns) for k, v in sample_row.items()
-        }
-        num_cols = len(sample_row)
+        field_type_configuration, fields, num_cols = solve_attribute_uri(
+            attr_type_sampler, columns
+        )
 
     if categorise_by_attribute and fields:
         assert (
@@ -403,15 +404,10 @@ def add_qgis_multi_feature_layer(
     for geom in geoms:
         # geom:QgsGeometry
 
-        from qgis.core import QgsWkbTypes
-
         if geom.wkbType() == QgsWkbTypes.NoGeometry:
             continue
 
         geom_type_ = QgsWkbTypes.translatedDisplayString(geom.wkbType())
-
-        if True:
-            logger.error(f"{geom}, {geom_type_=}")
 
         if geom_type is None:
             geom_type = geom_type_
@@ -591,44 +587,3 @@ def add_qgis_multi_feature_layer(
     assert len(return_collection) > 0, f"Return collection was empty"
 
     return return_collection
-
-
-def solve_field_uri(
-    field_type_configuration: Mapping, fields: Mapping, uri: str
-) -> str:
-    uri = str(uri).rstrip("&")
-    for k, v in fields.items():
-        uri += f"&field={k}:{v}"
-        if field_type_configuration is not None and k in field_type_configuration:
-            c = field_type_configuration[k]
-            if c:
-                uri += f"({c})"
-    return uri
-
-
-def to_string_if_not_of_exact_type(
-    gen: Iterable, type_: Iterable[type] = (int, float, str, bool)
-) -> Union[str, Any]:
-    """
-
-    :param type_: Type for testing against
-    :param gen: The iterable to be converted
-    :return:
-    """
-    if not isinstance(type_, Iterable):
-        type_ = [type_]
-
-    for v in gen:
-        if v is None:
-            yield None
-        elif isinstance(v, Collection):
-            if False:
-                yield list(
-                    str(v_) if all([type(v_) != t for t in type_]) else v_ for v_ in v
-                )  # TODO: SHOULD ALSO BE CONVERTED?
-            else:
-                yield v
-        elif all([type(v) != t for t in type_]):
-            yield str(v)
-        else:
-            yield v

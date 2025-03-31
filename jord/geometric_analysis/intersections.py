@@ -19,14 +19,14 @@ from jord.shapely_utilities import (
     split_line,
 )
 
-EPSILON = 1e-6
-
 __all__ = [
     "snap_lines",
     "split_lines",
     "intersection_points",
     "clip_lines_with_polygon",
 ]
+
+EPSILON = 1e-6
 
 
 def snap_lines(

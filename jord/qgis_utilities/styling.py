@@ -2,6 +2,12 @@ import logging
 from typing import Any, Iterable, Mapping, Optional
 
 # noinspection PyUnresolvedReferences
+import qgis._3d as q3d
+
+# noinspection PyUnresolvedReferences
+from qgis.PyQt.QtCore import QSizeF
+
+# noinspection PyUnresolvedReferences
 from qgis.PyQt.QtGui import QColor
 
 # noinspection PyUnresolvedReferences
@@ -15,8 +21,16 @@ from qgis.core import (
     QgsTextFormat,
     QgsVectorLayer,
     QgsVectorLayerSimpleLabeling,
+    QgsWkbTypes,
 )
 from warg import TripleNumber
+
+from jord.qgis_utilities.enums import (
+    Qgis3dAltitudeBinding,
+    Qgis3dAltitudeClamping,
+    Qgis3dCullingMode,
+    Qgis3dFacade,
+)
 
 __all__ = [
     "style_layer_from_mapping",
@@ -24,13 +38,6 @@ __all__ = [
     "set_label_styling",
     "set_layer_rendering_scale",
 ]
-
-from jord.qgis_utilities.enums import (
-    Qgis3dAltitudeClamping,
-    Qgis3dAltitudeBinding,
-    Qgis3dCullingMode,
-    Qgis3dFacade,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -157,8 +164,6 @@ def set_label_styling(
 
         # Set background if enabled
         if background:
-            from qgis.PyQt.QtCore import QSizeF
-
             bg_buffer = QgsTextBackgroundSettings()
             bg_buffer.setEnabled(True)
             bg_buffer.setFillColor(QColor(*background_color))
@@ -272,8 +277,6 @@ def set_3d_view_settings(
 
 
 def set_renderer(layer, line_renderer, point_renderer, polygon_renderer):
-    from qgis.core import QgsWkbTypes
-
     if layer.geometryType() == QgsWkbTypes.PointGeometry:  # QgsWkbTypes.Point:
         layer.setRenderer3D(point_renderer)
     elif layer.geometryType() == QgsWkbTypes.LineGeometry:  # QgsWkbTypes.Line:
@@ -285,8 +288,6 @@ def set_renderer(layer, line_renderer, point_renderer, polygon_renderer):
 
 
 def make_renderer(color, symbol):
-    import qgis._3d as q3d
-
     apply_common_symbol_settings(symbol)
     apply_material(color, symbol)
     renderer = q3d.QgsVectorLayer3DRenderer()
@@ -299,7 +300,6 @@ def make_polygon_symbol(
     culling_mode, edge_color, edge_width, extrusion, facades, offset
 ) -> Any:
     # ->q3d.QgsPolygon3DSymbol:
-    import qgis._3d as q3d
 
     symbol = q3d.QgsPolygon3DSymbol()
     symbol.setCullingMode(culling_mode.value)

@@ -4,15 +4,13 @@ import pickle
 from enum import Enum
 from typing import Any, Callable, Mapping, Sequence, Tuple, Union
 
-__all__ = ["build_package", "read_package"]
-
-# from sorcery import assigned_names
-
 from jord.qlive_utilities.procedures import QliveRPCMethodEnum, QliveRPCMethodMap
+
+__all__ = ["build_package", "read_package"]
 
 
 class SerialisationMethodEnum(Enum):
-    json, pickle = "json", "pickle"  # assigned_names()
+    json, pickle = "json", "pickle"
 
 
 SERIALISATION_METHOD = SerialisationMethodEnum.pickle

@@ -4,17 +4,17 @@ __doc__ = r"""
            Created on 5/5/22
            """
 
-__all__ = [
-    "store_project_setting",
-    "read_project_setting",
-    "restore_default_project_settings",
-]
-
 import logging
 from logging import warning
 from typing import Any, Mapping, Optional
 
 from jord import PROJECT_NAME, VERBOSE
+
+__all__ = [
+    "store_project_setting",
+    "read_project_setting",
+    "restore_default_project_settings",
+]
 
 
 def restore_default_project_settings(

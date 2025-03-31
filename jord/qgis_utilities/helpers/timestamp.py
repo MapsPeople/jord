@@ -12,10 +12,9 @@ from qgis.PyQt import QtGui
 
 # noinspection PyUnresolvedReferences
 from qgis.PyQt.QtCore import Qt
+from warg import Triple
 
 __all__ = ["qt_draw_timestamp"]
-
-from warg import Triple
 
 
 def qt_draw_timestamp(
@@ -37,10 +36,13 @@ def qt_draw_timestamp(
     :return:
     """
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+
     font = QtGui.QFont(font_family, font_size, font_style, font_weight)
     font.setPixelSize(font_size)
     font.setBold(True)
+
     painter = QtGui.QPainter(image)
+
     painter.setFont(font)
     painter.setPen(QtGui.QColor(*font_color))
     painter.drawText(
@@ -51,4 +53,5 @@ def qt_draw_timestamp(
         Qt.AlignCenter,
         timestamp,
     )
+
     painter.end()

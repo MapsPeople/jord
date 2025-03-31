@@ -1,4 +1,9 @@
-r"""
+from pathlib import Path
+from typing import Optional
+
+from ezdxf.addons import odafc
+
+__doc__ = r"""
 
 from ezdxf.addons import odafc
 
@@ -22,11 +27,6 @@ ezdxf.addons.odafc.unix_exec_path = "ODAFileConverter"
 
 https://ezdxf.readthedocs.io/en/stable/addons/odafc.html
 """
-
-from pathlib import Path
-from typing import Optional
-
-from ezdxf.addons import odafc
 
 __all__ = ["convert_to_dxf"]
 

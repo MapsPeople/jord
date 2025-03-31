@@ -8,9 +8,9 @@ from shapely.geometry.base import BaseGeometry
 from shapely.ops import unary_union
 from warg import Number
 
-__all__ = ["find_centerline"]
+from jord.shapely_utilities.polygons import iter_polygons, polygon_has_interior_rings
 
-from jord.shapely_utilities.polygons import polygon_has_interior_rings, iter_polygons
+__all__ = ["find_centerline"]
 
 
 def find_centerline(

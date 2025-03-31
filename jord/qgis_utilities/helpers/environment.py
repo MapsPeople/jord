@@ -5,15 +5,14 @@ __doc__ = r"""
            """
 
 import cgi
+import os
 import subprocess
+import sys
 from pathlib import Path
+from subprocess import check_output
+from typing import Iterable, Optional, Tuple
 
 __all__ = ["install_requirements_from_file", "install_requirements_from_name"]
-
-from typing import Iterable, Tuple, Optional
-import os
-from subprocess import check_output
-import sys
 
 SP_CALLABLE = subprocess.check_call  # subprocess.call
 
@@ -161,7 +160,8 @@ def install_requirements_from_name(*requirements_name: Iterable[str]) -> None:
     # ... # handle wrong input format
 
     args = ["install", "-U", *requirements_name]
-    # args = ["install", "rasterio", "--upgrade"] # RASTERIO for window DOES NOT WORK ATM, should be installed manually
+    # args = ["install", "rasterio", "--upgrade"] # RASTERIO for window DOES NOT WORK ATM, should be installed
+    # manually
 
     if False:
         import pip

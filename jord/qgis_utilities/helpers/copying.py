@@ -1,17 +1,12 @@
 from typing import Any
 
-__all__ = ["deepcopy_layer", "deepcopy_layer_old"]
+# noinspection PyUnresolvedReferences
+from qgis.core import QgsFeatureRequest, QgsField, QgsFieldConstraints, QgsVectorLayer
+
+__all__ = ["deepcopy_layer"]
 
 
-def deepcopy_layer(source_layer):
-    # noinspection PyUnresolvedReferences
-    from qgis.core import (
-        QgsFeatureRequest,
-        QgsVectorLayer,
-        QgsFieldConstraints,
-        QgsField,
-    )
-
+def deepcopy_layer(source_layer: Any) -> Any:
     new_layer = source_layer.materialize(
         QgsFeatureRequest().setFilterFids(source_layer.allFeatureIds())
     )
@@ -35,15 +30,7 @@ def deepcopy_layer(source_layer):
     return new_layer
 
 
-def deepcopy_layer_old(layer) -> Any:
-    # noinspection PyUnresolvedReferences
-    from qgis.core import (
-        QgsFeatureRequest,
-        QgsVectorLayer,
-        QgsFieldConstraints,
-        QgsField,
-    )
-
+def deepcopy_layer_old(layer: Any) -> Any:
     new_layer = layer.materialize(
         QgsFeatureRequest().setFilterFids(layer.allFeatureIds())
     )

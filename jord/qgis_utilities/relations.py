@@ -1,4 +1,13 @@
-from qgis.core import QgsEditorWidgetSetup, QgsVectorLayer
+# noinspection PyUnresolvedReferences
+from qgis.core import (
+    QgsEditorWidgetSetup,
+    QgsFeatureRequest,
+    QgsProject,
+    QgsVectorLayer,
+)
+
+# noinspection PyUnresolvedReferences
+from qgis.utils import iface
 
 __all__ = ["add_value_relation_field"]
 
@@ -43,9 +52,6 @@ def add_value_relation_field(
 
 
 def highlight_relationship():
-    from qgis.utils import iface
-    from qgis.core import QgsProject, QgsFeatureRequest
-
     parent = iface.activeLayer()  # Get parent layer from the ToC
 
     def selectChildren(fids, foo, bar):

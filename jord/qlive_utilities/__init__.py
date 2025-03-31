@@ -17,5 +17,4 @@ from .pandas_procedures import *
 from .parsing import *
 from .procedures import *
 from .serialisation import *
-from .type_solving import *
 from .uri_utilities import *

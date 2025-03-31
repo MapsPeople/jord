@@ -1,7 +1,9 @@
+from typing import Any
+
 import numpy
 
 
-def convert_raster_to_numpy_array(lyr) -> numpy.ndarray:
+def convert_raster_to_numpy_array(lyr: Any) -> numpy.ndarray:
     """
 
     # Input: QgsRasterLayer

@@ -1,17 +1,23 @@
 import datetime
-from typing import Any, List, Optional
+from typing import Any, Collection, Iterable, List, Mapping, Optional, Union
 
 ADD_STRING_LEN = True
 NUM_MB16_CHARS = 16777216
 
-__all__ = ["solve_type", "solve_type_configuration"]
+__all__ = [
+    "solve_qgis_type",
+    "solve_type_configuration",
+    "solve_attribute_uri",
+    "solve_field_uri",
+    "to_string_if_not_of_exact_type",
+]
 
 
-def solve_type(d: Any) -> str:
+def solve_qgis_type(d: Any) -> Optional[str]:
     """
     Does not support size/length yet...
 
-    QGUS Availible Field types:
+    QGIS Available Field types:
     ________________           - Provider type ( MemoryLayer) - implemented
 
     Whole Number (integer) - integer - X
@@ -40,6 +46,9 @@ def solve_type(d: Any) -> str:
     :param d:
     :return:
     """
+    if d is None:
+        return None
+
     if not isinstance(d, bool):
         if isinstance(d, int):
             return "integer"
@@ -84,6 +93,91 @@ def solve_type(d: Any) -> str:
     return "string"
 
 
+def solve_attribute_uri(attr_type_sampler, columns):
+    sample_row = next(attr_type_sampler)
+    num_cols = len(sample_row)
+
+    fields = {}
+    field_type_configuration = {}
+    for k, v in sample_row.items():
+        a = solve_qgis_type(v)
+
+        if fields.get(k) is None:
+            fields[k] = a
+
+        if a:
+            if field_type_configuration.get(k) is None:
+                field_type_configuration[k] = solve_type_configuration(v, k, columns)
+
+    for r in attr_type_sampler:
+        _solved = True
+        for k in fields.keys():
+            if fields.get(k) is None:
+                _solved = False
+
+        if _solved:
+            break
+
+        for k, v in r.items():
+            a = solve_qgis_type(v)
+
+            if fields.get(k) is None:
+                fields[k] = a
+
+            if a:
+                if field_type_configuration.get(k) is None:
+                    field_type_configuration[k] = solve_type_configuration(
+                        v, k, columns
+                    )
+
+    for f in list(fields.keys()):
+        if f not in field_type_configuration:
+            field_type_configuration[f] = None
+
+    return field_type_configuration, fields, num_cols
+
+
+def solve_field_uri(
+    field_type_configuration: Mapping, fields: Mapping, uri: str
+) -> str:
+    uri = str(uri).rstrip("&")
+    for k, v in fields.items():
+        uri += f"&field={k}:{v}"
+        if field_type_configuration is not None and k in field_type_configuration:
+            c = field_type_configuration[k]
+            if c:
+                uri += f"({c})"
+    return uri
+
+
+def to_string_if_not_of_exact_type(
+    gen: Iterable, type_: Iterable[type] = (int, float, str, bool)
+) -> Union[str, Any]:
+    """
+
+    :param type_: Type for testing against
+    :param gen: The iterable to be converted
+    :return:
+    """
+    if not isinstance(type_, Iterable):
+        type_ = [type_]
+
+    for v in gen:
+        if v is None:
+            yield None
+        elif isinstance(v, Collection):
+            if False:
+                yield list(
+                    str(v_) if all([type(v_) != t for t in type_]) else v_ for v_ in v
+                )  # TODO: SHOULD ALSO BE CONVERTED?
+            else:
+                yield v
+        elif all([type(v) != t for t in type_]):
+            yield str(v)
+        else:
+            yield v
+
+
 def solve_type_configuration(
     d: Any,
     k: Optional[str],
@@ -104,9 +198,10 @@ def solve_type_configuration(
         if k and columns:
             max_len = a
 
-            if isinstance(columns, List):
+            if isinstance(columns, Iterable):
                 for cols in columns:
                     c = cols[k]
+
                     if isinstance(c, str):
                         max_len = max(max_len, len(c))
 
