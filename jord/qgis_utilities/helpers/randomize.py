@@ -5,15 +5,15 @@ __all__ = ["randomize_field", "randomize_sub_tree_field"]
 
 from typing import Collection, Union, Any
 
+# noinspection PyUnresolvedReferences
+from qgis.core import QgsLayerTreeGroup, QgsLayerTreeLayer, QgsLayerTreeNode
+
 logger = logging.getLogger(__name__)
 
 
 def randomize_sub_tree_field(
     selected_nodes: Union[Any, Collection[Any]], field_name: str
 ) -> None:
-    # noinspection PyUnresolvedReferences
-    from qgis.core import QgsLayerTreeGroup, QgsLayerTreeLayer, QgsLayerTreeNode
-
     if isinstance(selected_nodes, QgsLayerTreeLayer):
         randomize_field(selected_nodes, field_name=field_name)
     elif isinstance(selected_nodes, QgsLayerTreeGroup):

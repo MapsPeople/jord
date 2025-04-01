@@ -4,11 +4,11 @@ __doc__ = r"""
            Created on 02-12-2020
            """
 
-__all__ = ["store_plugin_setting", "read_plugin_setting"]
-
 from typing import Any
 
 from jord import PROJECT_NAME
+
+__all__ = ["store_plugin_setting", "read_plugin_setting"]
 
 
 def store_plugin_setting(

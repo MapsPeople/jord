@@ -5,6 +5,7 @@ import shapely
 
 # noinspection PyUnresolvedReferences
 from qgis.core import QgsFeature, QgsGeometry, QgsPointXY
+from shapely.geometry import shape
 
 from jord.shapely_utilities import is_multi
 
@@ -12,8 +13,6 @@ logger = logging.getLogger(__name__)
 
 
 def already_exist_question_mark(iface):
-    from shapely.geometry import shape
-
     layer = iface.activeLayer()
     feature = layer.selectedFeatures()[0]
     shape(feature.__geo_interface__["geometry"])

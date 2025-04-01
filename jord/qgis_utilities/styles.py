@@ -2,8 +2,10 @@ from pathlib import Path
 
 __all__ = ["add_xml_style"]
 
+from typing import Any
 
-def add_xml_style(iface, path: Path = "styles/my_directional_lines.xml") -> None:
+
+def add_xml_style(iface: Any, path: Path = "styles/my_directional_lines.xml") -> None:
     # noinspection PyUnresolvedReferences
     from qgis.core import QgsStyle
 

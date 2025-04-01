@@ -12,14 +12,17 @@ from shapely.geometry.base import BaseGeometry
 from warg import Number, ensure_existence, passes_kws_to
 
 from jord import PROJECT_APP_PATH
+from jord.typing_utilities.type_solving import (
+    solve_field_uri,
+    solve_qgis_type,
+    solve_type_configuration,
+    to_string_if_not_of_exact_type,
+)
 from .layer_creation import (
     add_qgis_multi_feature_layer,
     add_qgis_single_feature_layer,
-    solve_field_uri,
-    to_string_if_not_of_exact_type,
 )
 from .parsing import wkb_geom_constructor
-from .type_solving import solve_type, solve_type_configuration
 
 APPEND_TIMESTAMP = True
 SKIP_MEMORY_LAYER_CHECK_AT_CLOSE = True
@@ -842,7 +845,7 @@ def add_no_geom_layer(
         assert isinstance(sample_row, Mapping)
 
     if sample_row:
-        fields = {k: solve_type(v) for k, v in sample_row.items()}
+        fields = {k: solve_qgis_type(v) for k, v in sample_row.items()}
         field_type_configuration = {
             k: solve_type_configuration(v, k, columns) for k, v in sample_row.items()
         }

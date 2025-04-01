@@ -4,6 +4,9 @@ import sys
 from pathlib import Path
 from typing import Any, Optional
 
+# noinspection PyUnresolvedReferences
+from qgis.core import QgsMessageLog
+
 __all__ = ["setup_logger", "add_logging_handler_once", "QgsLogHandler", "level_map"]
 
 level_map = {
@@ -42,9 +45,6 @@ class QgsLogHandler(logging.Handler):
                 logged.
         :type record: str
         """
-
-        # noinspection PyUnresolvedReferences
-        from qgis.core import QgsMessageLog
 
         push = False
 

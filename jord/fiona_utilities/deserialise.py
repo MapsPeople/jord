@@ -1,7 +1,13 @@
-__all__ = ["read_geometries"]
+__author__ = "heider"
+__doc__ = r"""
+
+           Created on 5/5/22
+           """
 
 from pathlib import Path
-from typing import Union, Tuple, Any
+from typing import Any, Tuple, Union
+
+__all__ = ["read_geometries"]
 
 
 def read_geometries(

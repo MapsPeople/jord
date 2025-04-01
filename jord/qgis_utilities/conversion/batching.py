@@ -11,6 +11,9 @@ from qgis.core import (
     Qgis,
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform,
+    QgsLayerTreeGroup,
+    QgsLayerTreeLayer,
+    QgsLayerTreeNode,
     QgsProject,
 )
 
@@ -24,9 +27,6 @@ def transform_sub_tree_features(
     transformer: QgsGcpGeometryTransformer,
     pre_transformer: Optional[Any] = None,
 ) -> None:
-    # noinspection PyUnresolvedReferences
-    from qgis.core import QgsLayerTreeGroup, QgsLayerTreeLayer, QgsLayerTreeNode
-
     if isinstance(selected_nodes, QgsLayerTreeLayer):
         transform_features(
             selected_nodes, transformer=transformer, pre_transformer=pre_transformer

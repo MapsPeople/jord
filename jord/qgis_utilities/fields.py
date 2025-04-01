@@ -1,18 +1,51 @@
 import logging
-from typing import Any, Iterable, Sequence
+from enum import Enum, IntEnum
+from typing import Any, Iterable, Mapping, Sequence, Type
 
 # noinspection PyUnresolvedReferences
-from qgis.core import QgsDefaultValue, QgsEditorWidgetSetup, QgsFieldConstraints
+from qgis.core import (
+    QgsDefaultValue,
+    QgsDefaultValue,
+    QgsEditorWidgetSetup,
+    QgsEditorWidgetSetup,
+    QgsFieldConstraints,
+    QgsFieldConstraints,
+    QgsMapLayer,
+)
 
 __all__ = [
-    "add_dropdown_widget",
+    "set_field_widget",
     "make_field_unique",
     "HIDDEN_WIDGET",
     "make_field_not_null",
     "make_field_default",
     "make_field_boolean",
     "make_field_reuse_last_entered_value",
+    "make_value_relation_widget",
+    "make_enum_dropdown_widget",
+    "make_iterable_dropdown_widget",
+    "make_mapping_dropdown_widget",
+    "field_to_datetime",
+    "field_readonly",
+    "make_external_resource_widget",
 ]
+
+
+class DocumentViewerEnum(IntEnum):
+    no_content = 0
+    image = 1
+    audio = 2
+    video = 3
+    web_view = 4
+
+
+AUTO = 0
+
+ABSOLUTE = 0
+RELATIVE = 1
+
+FILE_PATHS = 0
+DIRECTORY_PATHS = 1
 
 IGNORE_THIS_STRING = """
 
@@ -93,7 +126,7 @@ UNIQUE_VALUES_WIDGET = QgsEditorWidgetSetup(
 logger = logging.getLogger(__name__)
 
 
-def add_dropdown_widget(layers: Any, field_name: str, form_widget: Any) -> None:
+def set_field_widget(layers: Any, field_name: str, form_widget: Any) -> None:
     """
     https://gis.stackexchange.com/questions/470963/setting-dropdown-on-feature-attribute-form-using-plugin
       :param layer:
@@ -325,3 +358,182 @@ def fit_field_to_length(layers: Sequence[Any], field_name: str, length: int) -> 
                 if idx < 0:
                     continue
                 fields[idx].setLength(length)
+
+
+def make_enum_dropdown_widget(_enum: Type[Enum]) -> Any:
+    return QgsEditorWidgetSetup(  # 'UniqueValues', {'Editable':True},
+        "ValueMap",
+        {
+            "map": {
+                name: _enum.__getitem__(name).value
+                for name in sorted({l.name for l in _enum})
+            }
+        },
+    )
+
+
+def make_mapping_dropdown_widget(m: Mapping) -> Any:
+    return QgsEditorWidgetSetup(
+        "ValueMap",
+        {"map": {k: m[k] for k in sorted(m)}},
+    )
+
+
+def make_iterable_dropdown_widget(it: Iterable) -> Any:
+    return QgsEditorWidgetSetup(  # 'UniqueValues', {'Editable':True},
+        "ValueMap",
+        {"map": {name: name for name in sorted({l for l in it})}},
+    )
+
+
+def make_value_relation_widget(
+    target_layer_id: str,
+    *,
+    target_key_field_name: str = "key",
+    target_value_field_name: str = "name",
+    use_completer: bool = False,
+    order_by_value: bool = False,
+    allow_null_values: bool = False,
+    allow_multiple_values: bool = False
+) -> Any:
+    """
+      <editWidget type="ValueRelation">
+            <config>
+              <Option type="Map">
+                <Option value="false" type="bool" name="AllowMulti"/>
+                <Option value="false" type="bool" name="AllowNull"/>
+                <Option value="2" type="int" name="CompleterMatchFlags"/>
+                <Option value="&quot;name&quot;" type="QString" name="Description"/>
+                <Option value="true" type="bool" name="DisplayGroupName"/>
+                <Option value="" type="QString" name="FilterExpression"/>
+                <Option value="admin_id" type="QString" name="Group"/>
+                <Option value="admin_id" type="QString" name="Key"/>
+                <Option value="location_types_1743074272_2672093_6cf6edd7_a194_42b5_a1a9_8ccec987325c"
+                type="QString" name="Layer"/>
+                <Option value="location_types_1743074272.2672093" type="QString" name="LayerName"/>
+                <Option value="memory" type="QString" name="LayerProviderName"/>
+                <Option value="None?crs=EPSG:4326&amp;field=admin_id:text(255)&amp;field=name:text(
+                255)&amp;index=no&amp;uid={57bd270e-08b6-4e66-8a4f-81f703d3a3a5}" type="QString"
+                name="LayerSource"/>
+                <Option value="1" type="int" name="NofColumns"/>
+                <Option value="true" type="bool" name="OrderByValue"/>
+                <Option value="true" type="bool" name="UseCompleter"/>
+                <Option value="name" type="QString" name="Value"/>
+              </Option>
+            </config>
+          </editWidget>
+
+
+    :param target_layer_id:
+    :param target_key_field_name:
+    :param target_value_field_name:
+    :param use_completer:
+    :param order_by_value:
+    :param allow_null_values:
+    :param allow_multiple_values:
+    :return:
+    """
+
+    return QgsEditorWidgetSetup(
+        "ValueRelation",
+        {
+            "AllowMulti": allow_multiple_values,
+            "AllowNull": allow_null_values,
+            "FilterExpression": "",
+            "Key": target_key_field_name,
+            "Layer": target_layer_id,
+            "NofColumns": 1,
+            "OrderByValue": order_by_value,
+            "UseCompleter": use_completer,
+            "Value": target_value_field_name,
+        },
+    )
+
+
+def field_to_datetime(layer, field_name):
+    config = {
+        "allow_null": True,
+        "calendar_popup": True,
+        "display_format": "yyyy-MM-dd HH:mm:ss",
+        "field_format": "yyyy-MM-dd HH:mm:ss",
+        "field_iso_format": False,
+    }
+    type = "DateTime"
+    fields = layer.fields()
+    field_idx = fields.indexOf(field_name)
+
+    if field_idx >= 0:
+        widget_setup = QgsEditorWidgetSetup(type, config)
+        layer.setEditorWidgetSetup(field_idx, widget_setup)
+        layer.setDefaultValueDefinition(field_idx, QgsDefaultValue("now()"))
+
+
+def field_readonly(layer, fieldname, option=True):
+    if layer.type() != QgsMapLayer.VectorLayer:
+        return
+
+    fields = layer.fields()
+    field_idx = fields.indexOf(fieldname)
+    if field_idx >= 0:
+        form_config = layer.editFormConfig()
+        form_config.setReadOnly(field_idx, option)
+        layer.setEditFormConfig(form_config)
+
+
+def make_external_resource_widget(
+    document_viewer: DocumentViewerEnum = DocumentViewerEnum.image,
+    document_viewer_width: int = AUTO,
+    document_viewer_height: int = AUTO,
+):
+    """
+
+
+    <editWidget type="ExternalResource">
+          <config>
+            <Option type="Map">
+              <Option name="DocumentViewer" type="int" value="0"/>
+              <Option name="DocumentViewerHeight" type="int" value="0"/>
+              <Option name="DocumentViewerWidth" type="int" value="0"/>
+              <Option name="FileWidget" type="bool" value="true"/>
+              <Option name="FileWidgetButton" type="bool" value="true"/>
+              <Option name="FileWidgetFilter" type="QString" value=""/>
+              <Option name="PropertyCollection" type="Map">
+                <Option name="name" type="QString" value=""/>
+                <Option name="properties"/>
+                <Option name="type" type="QString" value="collection"/>
+              </Option>
+              <Option name="RelativeStorage" type="int" value="0"/>
+              <Option name="StorageAuthConfigId" type="QString" value=""/>
+              <Option name="StorageMode" type="int" value="0"/>
+              <Option name="StorageType" type="QString" value=""/>
+            </Option>
+          </config>
+        </editWidget>
+
+    :param document_viewer:
+    :param document_viewer_width:
+    :param document_viewer_height:
+    :return:
+    """
+
+    return QgsEditorWidgetSetup(
+        "ExternalResource",
+        {
+            "FileWidget": True,
+            "FileWidgetButton": True,
+            "FileWidgetFilter": "",
+            "DocumentViewer": document_viewer.value,
+            "DocumentViewerHeight": document_viewer_height,
+            "DocumentViewerWidth": document_viewer_width,
+            "RelativeStorage": ABSOLUTE,
+            "StorageMode": FILE_PATHS,
+        },
+    )
+
+
+IGNORE_THIS_STRING3 = """
+
+ews = layer.editorWidgetSetup(field_index)
+print("Type:", ews.type())
+print("Config:", ews.config())
+"""

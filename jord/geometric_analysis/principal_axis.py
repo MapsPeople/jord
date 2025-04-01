@@ -13,15 +13,14 @@ __all__ = [
     "other_mass_projection_is_longer",
 ]
 
+logger = logging.getLogger(__name__)
+
 
 class PrincipalityMeasure(Enum):
     double_doors = "double_doors"
     length = "length"
     density = "density"
     hybrid = "hybrid"
-
-
-logger = logging.getLogger(__name__)
 
 
 def other_mass_projection_is_longer(

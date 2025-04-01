@@ -4,12 +4,11 @@ from typing import Callable
 from jord.qlive_utilities.client import QliveClient
 from jord.qlive_utilities.procedures import QliveRPCMethodEnum, QliveRPCMethodMap
 from jord.qlive_utilities.serialisation import build_package
+from .arguments import partial_satisfied
 
 __doc__ = r"""Warning this client a no client-side validation, which might result in server-side exceptions"""
 
 __all__ = ["AutoQliveClient"]
-
-from jord.qlive_utilities.clients.arguments import partial_satisfied
 
 
 class AutoQliveClient(QliveClient):
