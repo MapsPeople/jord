@@ -1,10 +1,10 @@
-__all__ = ["build_uri"]
-
 import json
 from typing import Any, Mapping, Optional
 
+__all__ = ["build_uri_oh_no"]
 
-def build_uri(
+
+def build_uri_oh_no(
     geom: Any,
     crs: Optional[str] = None,
     fields: Optional[Mapping[str, str]] = None,

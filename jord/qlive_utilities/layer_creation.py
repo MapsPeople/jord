@@ -94,7 +94,7 @@ def add_qgis_single_feature_layer(
     if geom.wkbType() == QgsWkbTypes.NoGeometry:
         return return_collection
 
-    geom_type = QgsWkbTypes.translatedDisplayString(geom.wkbType())
+    geom_type = QgsWkbTypes.displayString(geom.wkbType())
 
     if True:
         logger.error(f"{geom},{geom_type=}")

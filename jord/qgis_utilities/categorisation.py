@@ -1,6 +1,7 @@
+import logging
 import random
 from itertools import cycle
-from typing import Callable, Generator, Iterable, Sized
+from typing import Any, Callable, Generator, Iterable, Sized
 
 # noinspection PyUnresolvedReferences
 from qgis.PyQt.QtGui import QColor
@@ -8,10 +9,17 @@ from qgis.PyQt.QtGui import QColor
 # noinspection PyUnresolvedReferences
 from qgis.core import (
     QgsCategorizedSymbolRenderer,
+    QgsExpression,
+    QgsExpressionContext,
+    QgsExpressionContextUtils,
+    QgsFeature,
+    QgsFeatureRequest,
+    QgsProject,
     QgsRendererCategory,
     QgsSimpleFillSymbolLayer,
     QgsSymbol,
     QgsVectorLayer,
+    QgsVectorLayerUtils,
 )
 
 # noinspection PyUnresolvedReferences
@@ -24,7 +32,10 @@ __all__ = [
     "random_color_generator",
     "random_rgba",
     "random_rgb",
+    "styled_field_value_categorised",
 ]
+
+logger = logging.getLogger(__name__)
 
 
 def random_rgb(mix: TripleNumber = (255, 255, 255)) -> TripleNumber:
@@ -68,6 +79,9 @@ def categorise_layer(
     https://qgis.org/pyqgis/3.0/core/Vector/QgsVectorLayer.html
     https://qgis.org/pyqgis/3.0/core/other/QgsFields.html
 
+    :param outline_width:
+    :param outline_only:
+    :param opacity:
     :param layer:
     :param field_name:
     :param color_iterable:
@@ -133,6 +147,65 @@ def categorise_layer(
             )
 
     layer.setRenderer(QgsCategorizedSymbolRenderer(field_name, render_categories))
+    layer.triggerRepaint()
+    iface.layerTreeView().refreshLayerSymbology(layer.id())
+
+
+def styled_field_value_categorised(
+    layer: Any, style_attributes_layer, field_name="location_type"
+) -> None:
+    expression_str = f'represent_value("{field_name}")'
+    # expression_str_unquoted = f'represent_value({field_name})'
+
+    render_categories = []
+    added_references = set()
+
+    style_features = {f["admin_id"]: f for f in style_attributes_layer.getFeatures()}
+
+    refs = QgsVectorLayerUtils.getValues(layer, field_name, selectedOnly=False)[0]
+    # refs = [r.lstrip('{').rstrip('}') for r in refs]
+    cats = QgsVectorLayerUtils.getValues(layer, expression_str, selectedOnly=False)[0]
+
+    assert len(refs) == len(cats), f"{refs=}, {cats=}"
+
+    for ref, cat in zip(refs, cats, strict=True):
+        if False:
+            logger.error(cat)
+
+        if cat is not None and ref not in added_references:
+            sym = QgsSymbol.defaultSymbol(layer.geometryType())
+
+            # Apply style from reference feature if available
+            if ref in style_features:
+                style_feature = style_features[ref]
+                key = "display_rule.polygon.fillColor"
+                if key in style_feature.fields().names():
+                    fill_color = str(style_feature[key])
+                    if "#" in fill_color:
+                        if False:
+                            logger.error(
+                                f"Set fill_color {fill_color} for {cat} in layer {layer.id()}"
+                            )
+                        sym.setColor(QColor(fill_color))
+                    else:
+                        if False:
+                            logger.error(
+                                f"Did not set fill_color for {cat} in layer {layer.id()}"
+                            )
+
+            render_categories.append(
+                QgsRendererCategory(ref, symbol=sym, label=cat, render=True)
+            )
+            added_references.add(ref)
+
+    sym = QgsSymbol.defaultSymbol(layer.geometryType())
+    render_categories.append(
+        QgsRendererCategory(None, symbol=sym, label="", render=True)
+    )
+
+    renderer = QgsCategorizedSymbolRenderer(field_name, render_categories)
+
+    layer.setRenderer(renderer)
     layer.triggerRepaint()
     iface.layerTreeView().refreshLayerSymbology(layer.id())
 

@@ -7,7 +7,7 @@ from typing import Any, Optional
 # noinspection PyUnresolvedReferences
 from qgis.core import QgsMessageLog
 
-__all__ = ["setup_logger", "add_logging_handler_once", "QgsLogHandler", "level_map"]
+__all__ = ["setup_qgs_logger", "add_logging_handler_once", "QgsLogHandler", "level_map"]
 
 level_map = {
     logging.NOTSET: 0,  # Qgis.MessageLevel.NoLevel
@@ -91,7 +91,7 @@ def add_logging_handler_once(logger: logging.Logger, handler: logging.Handler) -
     return True
 
 
-def setup_logger(
+def setup_qgs_logger(
     logger_name: str,
     *,
     iface: Optional[Any] = None,
@@ -102,6 +102,10 @@ def setup_logger(
 ) -> logging.Logger:
     """Run once when the module is loaded and enable logging.
 
+    :param default_handler_level:
+    :param logger_level:
+    :param iface:
+    :param logger_name:
     :param sentry_url: Mandatory url to sentry api for remote logging.
         Consult your sentry instance for the client instance url.
     :type sentry_url: str
@@ -115,7 +119,7 @@ def setup_logger(
     Use this to first initialise the logger in your __init__.py::
 
        import custom_logging
-       custom_logging.setup_logger('http://path to sentry')
+       custom_logging.setup_qgs_logger('http://path to sentry')
 
     You would typically only need to do the above once ever as the
     safe model is initialised early and will set up the logger
@@ -137,7 +141,14 @@ def setup_logger(
        /tmp/23-08-2012/timlinux/logs/qgis.log
 
     """
+    if True:  # remove all handlers associated with the root logger object, QGIS
+        for h in logging.root.handlers:
+            logging.root.removeHandler(h)
+
     logger = logging.getLogger(logger_name)
+
+    # logger.handlers.clear()  # TODO: QGIS STDOUT logging seems to not work
+    # logger.handlers = [     h for h in logger.handlers if isinstance(h, logging.StreamHandler)]
     logger.setLevel(logger_level)
 
     # create formatter that will be added to the handlers

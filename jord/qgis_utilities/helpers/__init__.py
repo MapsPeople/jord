@@ -15,7 +15,7 @@ from .drawing import *
 from .environment import *
 from .garbage_collection import *
 from .groups import *
-from .logging import *
+from .logging_utilities import *
 from .models import *
 from .progress_bar import *
 from .randomize import *

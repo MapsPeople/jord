@@ -1,5 +1,19 @@
 import datetime
-from typing import Any, Collection, Iterable, List, Mapping, Optional, Union
+import logging
+import math
+from typing import (
+    Any,
+    Collection,
+    Generator,
+    Iterable,
+    List,
+    Mapping,
+    Optional,
+    Tuple,
+    Union,
+)
+
+import pandas
 
 ADD_STRING_LEN = True
 NUM_MB16_CHARS = 16777216
@@ -11,6 +25,8 @@ __all__ = [
     "solve_field_uri",
     "to_string_if_not_of_exact_type",
 ]
+
+logger = logging.getLogger(__name__)
 
 
 def solve_qgis_type(d: Any) -> Optional[str]:
@@ -49,11 +65,14 @@ def solve_qgis_type(d: Any) -> Optional[str]:
     if d is None:
         return None
 
+    if pandas.isna(d):
+        return None
+
     if not isinstance(d, bool):
         if isinstance(d, int):
             return "integer"
 
-        elif isinstance(d, float):
+        elif isinstance(d, float) and (not math.isnan(d)):
             return "double"
 
         elif isinstance(d, bytes):
@@ -79,12 +98,17 @@ def solve_qgis_type(d: Any) -> Optional[str]:
                     return f"string({min(max(len(d) * 16, 255), NUM_MB16_CHARS)})"  # 16x buffer for large strings
             else:
                 return "text"
+        else:
+            if False:
+                logger.error(f"Could not solve type {type(d)=}, {d.__class__.__name__}")
 
     if isinstance(d, bool):
         if False:
             if ADD_STRING_LEN:
                 return "string(255)"  # True, False (5)
         else:
+            if False:
+                logger.error(f"Fallback solve type {type(d)=}, {d.__class__.__name__}")
             return "boolean"
 
     if False:
@@ -93,7 +117,9 @@ def solve_qgis_type(d: Any) -> Optional[str]:
     return "string"
 
 
-def solve_attribute_uri(attr_type_sampler, columns):
+def solve_attribute_uri(
+    attr_type_sampler: Generator, columns: Collection
+) -> Tuple[Mapping[str, str], Mapping[str, str], int]:
     sample_row = next(attr_type_sampler)
     num_cols = len(sample_row)
 
@@ -141,12 +167,14 @@ def solve_field_uri(
     field_type_configuration: Mapping, fields: Mapping, uri: str
 ) -> str:
     uri = str(uri).rstrip("&")
+
     for k, v in fields.items():
         uri += f"&field={k}:{v}"
         if field_type_configuration is not None and k in field_type_configuration:
             c = field_type_configuration[k]
             if c:
                 uri += f"({c})"
+
     return uri
 
 

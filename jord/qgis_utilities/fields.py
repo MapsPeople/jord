@@ -450,7 +450,7 @@ def make_value_relation_widget(
     )
 
 
-def field_to_datetime(layer, field_name):
+def field_to_datetime(layer: Any, field_name: str) -> None:
     config = {
         "allow_null": True,
         "calendar_popup": True,
@@ -462,18 +462,17 @@ def field_to_datetime(layer, field_name):
     fields = layer.fields()
     field_idx = fields.indexOf(field_name)
 
-    if field_idx >= 0:
-        widget_setup = QgsEditorWidgetSetup(type, config)
-        layer.setEditorWidgetSetup(field_idx, widget_setup)
-        layer.setDefaultValueDefinition(field_idx, QgsDefaultValue("now()"))
+    widget_setup = QgsEditorWidgetSetup(type, config)
+    layer.setEditorWidgetSetup(field_idx, widget_setup)
+    layer.setDefaultValueDefinition(field_idx, QgsDefaultValue("now()"))
 
 
-def field_readonly(layer, fieldname, option=True):
+def field_readonly(layer: Any, field_name: str, option: bool = True) -> None:
     if layer.type() != QgsMapLayer.VectorLayer:
         return
 
     fields = layer.fields()
-    field_idx = fields.indexOf(fieldname)
+    field_idx = fields.indexOf(field_name)
     if field_idx >= 0:
         form_config = layer.editFormConfig()
         form_config.setReadOnly(field_idx, option)
@@ -484,7 +483,7 @@ def make_external_resource_widget(
     document_viewer: DocumentViewerEnum = DocumentViewerEnum.image,
     document_viewer_width: int = AUTO,
     document_viewer_height: int = AUTO,
-):
+) -> Any:
     """
 
 

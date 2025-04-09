@@ -2,6 +2,7 @@ import logging
 import time
 import uuid
 from enum import Enum
+from itertools import tee
 from typing import Any, Iterable, List, Mapping, Optional, Tuple, Union
 
 import numpy
@@ -13,9 +14,8 @@ from warg import Number, ensure_existence, passes_kws_to
 
 from jord import PROJECT_APP_PATH
 from jord.typing_utilities.type_solving import (
+    solve_attribute_uri,
     solve_field_uri,
-    solve_qgis_type,
-    solve_type_configuration,
     to_string_if_not_of_exact_type,
 )
 from .layer_creation import (
@@ -822,7 +822,6 @@ def add_no_geom_layer(
 
     uri = "None"
 
-    sample_row = None
     num_cols = None
     attr_generator = None
     fields = None
@@ -830,26 +829,15 @@ def add_no_geom_layer(
 
     if columns and len(columns):  # TODO: FIND MAX LENGTH STR
         if isinstance(columns, Mapping):
-            sample_row = next(iter(columns.values()), None)
-            # TODO: Might not be ordered correctly
-            # if isinstance(next(iter(columns.values())), Mapping):
-            #    ...
-            attr_generator = iter(columns.values())
+            attr_generator, attr_type_sampler = tee(iter(columns.values()))
         elif isinstance(columns, Iterable):
-            sample_row = next(iter(columns), None)
-            # TODO: Might not be ordered correctly
-            # if isinstance(next(iter(columns.values())), Mapping):
-            #    ...
-            attr_generator = iter(columns)
+            attr_generator, attr_type_sampler = tee(iter(columns))
+        else:
+            raise TypeError(f"columns must be a mapping or an iterable of mappings")
 
-        assert isinstance(sample_row, Mapping)
-
-    if sample_row:
-        fields = {k: solve_qgis_type(v) for k, v in sample_row.items()}
-        field_type_configuration = {
-            k: solve_type_configuration(v, k, columns) for k, v in sample_row.items()
-        }
-        num_cols = len(sample_row)
+        field_type_configuration, fields, num_cols = solve_attribute_uri(
+            attr_type_sampler, columns
+        )
 
     features = []
     for row in attr_generator:
