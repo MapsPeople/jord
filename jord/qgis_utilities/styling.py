@@ -11,10 +11,12 @@ from qgis.PyQt.QtCore import QSizeF
 from qgis.PyQt.QtGui import QColor
 
 # noinspection PyUnresolvedReferences
+# noinspection PyUnresolvedReferences
 from qgis.core import (
     QgsCategorizedSymbolRenderer,
     QgsLineSymbol,
     QgsPalLayerSettings,
+    QgsProject,
     QgsRendererCategory,
     QgsSymbol,
     QgsTextBackgroundSettings,
@@ -23,6 +25,9 @@ from qgis.core import (
     QgsVectorLayerSimpleLabeling,
     QgsWkbTypes,
 )
+
+# noinspection PyUnresolvedReferences
+from qgis.utils import iface
 from warg import TripleNumber
 
 from jord.qgis_utilities.enums import (
@@ -185,10 +190,26 @@ def set_label_styling(
         label_settings.placement = QgsPalLayerSettings.AroundPoint
         label_settings.priority = 5
         label_settings.obstacleScale = 1.0
+        label_settings.enabled = True
+        label_settings.isExpression = True
 
-        layer_settings = QgsVectorLayerSimpleLabeling(label_settings)
-        layer.setLabeling(layer_settings)
+        layer_simple_label = QgsVectorLayerSimpleLabeling(label_settings)
         layer.setLabelsEnabled(True)
+        layer.setLabeling(layer_simple_label)
+        layer.triggerRepaint()
+
+        # layer.resolveReferences(QgsProject.instance())
+        # layer.reload()
+        # layer.styleManager().
+        # layer.styleChanged.emit()
+        # layer.countSymbolFeatures()
+        # layer.symbolFeatureCountMapChanged.emit()
+
+        # iface.layerTreeView().refreshLayerSymbology(layer.id())
+        # QgsProject.instance().reloadAllLayers()
+
+        # node = QgsProject.instance().layerTreeRoot().findLayer(layer.id())
+        # iface.layerTreeView().layerTreeModel().refreshLayerLegend(node)
 
 
 def make_line_symbol(

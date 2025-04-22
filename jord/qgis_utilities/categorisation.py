@@ -157,60 +157,96 @@ def styled_field_value_categorised(
     expression_str = f'represent_value("{field_name}")'
     # expression_str_unquoted = f'represent_value({field_name})'
 
-    render_categories = []
-    added_references = set()
-
-    style_features = {f["admin_id"]: f for f in style_attributes_layer.getFeatures()}
-
-    refs = QgsVectorLayerUtils.getValues(layer, field_name, selectedOnly=False)[0]
-    # refs = [r.lstrip('{').rstrip('}') for r in refs]
     cats = QgsVectorLayerUtils.getValues(layer, expression_str, selectedOnly=False)[0]
 
-    assert len(refs) == len(cats), f"{refs=}, {cats=}"
+    if True:
+        render_categories = []
+        added_references = set()
 
-    for ref, cat in zip(refs, cats, strict=True):
-        if False:
-            logger.error(cat)
+        style_features = {
+            f["admin_id"]: f for f in style_attributes_layer.getFeatures()
+        }
 
-        if cat is not None and ref not in added_references:
-            sym = QgsSymbol.defaultSymbol(layer.geometryType())
+        # refs = [r.lstrip('{').rstrip('}') for r in refs]
+        refs = QgsVectorLayerUtils.getValues(layer, field_name, selectedOnly=False)[0]
 
-            # Apply style from reference feature if available
-            if ref in style_features:
-                style_feature = style_features[ref]
-                key = "display_rule.polygon.fillColor"
-                if key in style_feature.fields().names():
-                    fill_color = str(style_feature[key])
-                    if "#" in fill_color:
-                        if False:
-                            logger.error(
-                                f"Set fill_color {fill_color} for {cat} in layer {layer.id()}"
-                            )
-                        sym.setColor(QColor(fill_color))
-                    else:
-                        if False:
-                            logger.error(
-                                f"Did not set fill_color for {cat} in layer {layer.id()}"
-                            )
+        assert len(refs) == len(cats), f"{refs=}, {cats=}"
 
-            render_categories.append(
-                QgsRendererCategory(ref, symbol=sym, label=cat, render=True)
+        for ref, cat in zip(refs, cats, strict=True):
+            if False:
+                logger.error(cat)
+
+            if cat is not None and ref not in added_references:
+                sym = QgsSymbol.defaultSymbol(layer.geometryType())
+
+                # Apply style from reference feature if available
+                if ref in style_features:
+                    style_feature = style_features[ref]
+                    key = "display_rule.polygon.fillColor"
+                    if key in style_feature.fields().names():
+                        fill_color = str(style_feature[key])
+                        if "#" in fill_color:
+                            if False:
+                                logger.error(
+                                    f"Set fill_color {fill_color} for {cat} in layer {layer.id()}"
+                                )
+                            sym.setColor(QColor(fill_color))
+                        else:
+                            if False:
+                                logger.error(
+                                    f"Did not set fill_color for {cat} in layer {layer.id()}"
+                                )
+
+                render_categories.append(
+                    QgsRendererCategory(
+                        ref, symbol=sym, label=cat, render=True, uuid=ref
+                    )
+                )
+                added_references.add(ref)
+
+        sym = QgsSymbol.defaultSymbol(layer.geometryType())
+        render_categories.append(
+            QgsRendererCategory(
+                None,
+                symbol=sym,
+                label="",
+                render=True,
+                # uuid=ref
             )
-            added_references.add(ref)
+        )
 
-    sym = QgsSymbol.defaultSymbol(layer.geometryType())
-    render_categories.append(
-        QgsRendererCategory(None, symbol=sym, label="", render=True)
-    )
+        # renderer = QgsCategorizedSymbolRenderer(expression_str, render_categories) # DOES NOT WORK PROPER
 
-    renderer = QgsCategorizedSymbolRenderer(field_name, render_categories)
+        renderer = QgsCategorizedSymbolRenderer(field_name, render_categories)
+
+    else:
+        renderer = QgsCategorizedSymbolRenderer()
+        renderer.setClassAttribute(expression_str)
+
+        for c in renderer.createCategories(
+            cats, QgsSymbol.defaultSymbol(layer.geometryType())
+        ):
+            renderer.addCategory(c)
+
+    # renderer.filter()
+    # renderer.setUsingSymbolLevels()
+
+    # renderer.setOrderBy(QgsFeatureRequest.OrderBy([QgsFeatureRequest.OrderByClause(expression_str, False)]))
+    # renderer.setOrderByEnabled(True)
 
     layer.setRenderer(renderer)
     layer.triggerRepaint()
-    iface.layerTreeView().refreshLayerSymbology(layer.id())
+    if False:
+        iface.layerTreeView().refreshLayerSymbology(layer.id())
+        iface.layerTreeView().layerTreeModel().refreshLayerLegend(
+            QgsProject.instance().layerTreeRoot().findLayer(layer.id())
+        )
+        # iface.layerTreeView().layerTreeModel().recursivelyEmitDataChanged()
 
 
-def set_symbol_styling(color_iter, opacity, outline_only, outline_width, sym) -> None:
+def set_symbol_styling(
+    color_iter, opacity: float, outline_only: bool, outline_width: float, sym
+) -> None:
     col = next(color_iter)
     if len(col) == 3:
         col = (*col, 255)

@@ -13,7 +13,9 @@ from typing import (
     Union,
 )
 
+import numpy
 import pandas
+from pandas.core.generic import NDFrame
 
 ADD_STRING_LEN = True
 NUM_MB16_CHARS = 16777216
@@ -65,9 +67,6 @@ def solve_qgis_type(d: Any) -> Optional[str]:
     if d is None:
         return None
 
-    if pandas.isna(d):
-        return None
-
     if not isinstance(d, bool):
         if isinstance(d, int):
             return "integer"
@@ -101,6 +100,15 @@ def solve_qgis_type(d: Any) -> Optional[str]:
         else:
             if False:
                 logger.error(f"Could not solve type {type(d)=}, {d.__class__.__name__}")
+
+    if numpy.isnan(d):
+        return None
+
+    if isinstance(d, NDFrame) and d.size == 0:
+        return None
+
+    if pandas.isna(d):
+        return None
 
     if isinstance(d, bool):
         if False:
