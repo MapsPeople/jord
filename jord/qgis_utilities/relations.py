@@ -51,7 +51,7 @@ def add_value_relation_field(
     layer.setEditorWidgetSetup(layer.fields().indexOf(field_name), setup)
 
 
-def highlight_relationship():
+def highlight_relationship() -> None:
     parent = iface.activeLayer()  # Get parent layer from the ToC
 
     def selectChildren(fids, foo, bar):

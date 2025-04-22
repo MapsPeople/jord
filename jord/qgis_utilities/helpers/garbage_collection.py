@@ -4,6 +4,8 @@ import qgis
 # noinspection PyUnresolvedReferences
 from qgis.core import QgsProject
 
+__all__ = ["gc_layers"]
+
 
 def gc_layers() -> None:
     registry_layers = QgsProject.instance().mapLayers().keys()

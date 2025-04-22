@@ -1,11 +1,6 @@
-from pathlib import Path
-
-from apppath import AppPath
-from warg import clean_string, get_version, package_is_editable
-
 __project__ = "Jord"
 __author__ = "Christian Heider Lindbjerg"
-__version__ = "0.9.8"
+__version__ = "0.9.9"
 __doc__ = r"""
 .. module:: jord
    :platform: Unix, Windows
@@ -17,6 +12,11 @@ Created on 27/04/2019
 
 @author: cnheider
 """
+
+from pathlib import Path
+
+from apppath import AppPath
+from warg import clean_string, get_version, package_is_editable
 
 with open(Path(__file__).parent / "README.md") as this_init_file:
     __doc__ += this_init_file.read()
