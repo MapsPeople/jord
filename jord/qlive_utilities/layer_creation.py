@@ -80,7 +80,7 @@ def add_qgis_single_feature_layer(
         QgsProject,
         QgsWkbTypes,
     )
-    from jord.qgis_utilities.categorisation import categorise_layer
+    from jord.qgis_utilities import categorise_layer
 
     # noinspection PyUnresolvedReferences
     import qgis
