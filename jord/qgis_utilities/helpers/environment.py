@@ -4,7 +4,6 @@ __doc__ = r"""
            Created on 02-12-2020
            """
 
-import cgi
 import os
 import subprocess
 import sys
@@ -101,6 +100,8 @@ def get_newest_version(
             charset = headers.getparam("charset")
             if charset is None:
                 ct_header = headers.getheader("Content-Type")
+                import cgi
+
                 content_type, params = cgi.parse_header(ct_header)
                 charset = params.get("charset", default)
         return charset
