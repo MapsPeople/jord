@@ -24,7 +24,8 @@ __all__ = [
     "make_value_relation_widget",
     "make_enum_dropdown_widget",
     "make_iterable_dropdown_widget",
-    "make_mapping_dropdown_widget",
+    "make_sorted_mapping_dropdown_widget",
+    "make_value_map_widget",
     "field_to_datetime",
     "field_readonly",
     "make_external_resource_widget",
@@ -129,10 +130,12 @@ logger = logging.getLogger(__name__)
 def set_field_widget(layers: Any, field_name: str, form_widget: Any) -> None:
     """
     https://gis.stackexchange.com/questions/470963/setting-dropdown-on-feature-attribute-form-using-plugin
-      :param layer:
-      :param field_name:
-      :param form_widget:
-      :return:
+
+
+    :param layer:
+    :param field_name:
+    :param form_widget:
+    :return:
     """
 
     if layers is None:
@@ -163,6 +166,13 @@ def set_field_widget(layers: Any, field_name: str, form_widget: Any) -> None:
 def make_field_unique(
     layers: Sequence[Any], *, field_name: str = "id", auto_generate: bool = True
 ) -> None:
+    """
+
+    :param layers:
+    :param field_name:
+    :param auto_generate:
+    :return:
+    """
     if layers is None:
         return
 
@@ -234,6 +244,12 @@ def make_field_unique(
 
 
 def make_field_not_null(layers: Sequence[Any], field_name: str = "name") -> None:
+    """
+
+    :param layers:
+    :param field_name:
+    :return:
+    """
     if layers is None:
         return
 
@@ -261,6 +277,13 @@ def make_field_not_null(layers: Sequence[Any], field_name: str = "name") -> None
 def make_field_default(
     layers: Sequence[Any], field_name: str, default_expression: str = "'None'"
 ) -> None:
+    """
+
+    :param layers:
+    :param field_name:
+    :param default_expression:
+    :return:
+    """
     if layers is None:
         return
 
@@ -282,6 +305,12 @@ def make_field_default(
 
 
 def make_field_boolean(layers: Sequence[Any], field_name: str) -> None:
+    """
+
+    :param layers:
+    :param field_name:
+    :return:
+    """
     if layers is None:
         return
 
@@ -309,6 +338,12 @@ def make_field_boolean(layers: Sequence[Any], field_name: str) -> None:
 
 
 def make_field_reuse_last_entered_value(layers: Sequence[Any], field_name: str) -> None:
+    """
+
+    :param layers:
+    :param field_name:
+    :return:
+    """
     if layers is None:
         return
 
@@ -337,6 +372,13 @@ def make_field_reuse_last_entered_value(layers: Sequence[Any], field_name: str) 
 
 
 def fit_field_to_length(layers: Sequence[Any], field_name: str, length: int) -> None:
+    """
+
+    :param layers:
+    :param field_name:
+    :param length:
+    :return:
+    """
     if layers is None:
         return
 
@@ -360,30 +402,48 @@ def fit_field_to_length(layers: Sequence[Any], field_name: str, length: int) -> 
                 fields[idx].setLength(length)
 
 
-def make_enum_dropdown_widget(_enum: Type[Enum]) -> Any:
-    return QgsEditorWidgetSetup(  # 'UniqueValues', {'Editable':True},
-        "ValueMap",
-        {
-            "map": {
-                name: _enum.__getitem__(name).value
-                for name in sorted({l.name for l in _enum})
-            }
-        },
-    )
+def make_value_map_widget(mapp: Mapping[str, Any]) -> Any:
+    """
 
-
-def make_mapping_dropdown_widget(m: Mapping) -> Any:
+    :param mapp:
+    :return:
+    """
     return QgsEditorWidgetSetup(
         "ValueMap",
-        {"map": {k: m[k] for k in sorted(m)}},
+        {"map": mapp},
     )
+
+
+def make_enum_dropdown_widget(_enum: Type[Enum]) -> Any:
+    """
+
+    :param _enum:
+    :return:
+    """
+    return make_value_map_widget(
+        {
+            name: _enum.__getitem__(name).value
+            for name in sorted({l.name for l in _enum})
+        }
+    )
+
+
+def make_sorted_mapping_dropdown_widget(m: Mapping[str, Any]) -> Any:
+    """
+
+    :param m:
+    :return:
+    """
+    return make_value_map_widget({k: m[k] for k in sorted(m)})
 
 
 def make_iterable_dropdown_widget(it: Iterable) -> Any:
-    return QgsEditorWidgetSetup(  # 'UniqueValues', {'Editable':True},
-        "ValueMap",
-        {"map": {name: name for name in sorted({l for l in it})}},
-    )
+    """
+
+    :param it:
+    :return:
+    """
+    return make_value_map_widget({name: name for name in sorted({l for l in it})})
 
 
 def make_value_relation_widget(
@@ -451,6 +511,12 @@ def make_value_relation_widget(
 
 
 def field_to_datetime(layer: Any, field_name: str) -> None:
+    """
+
+    :param layer:
+    :param field_name:
+    :return:
+    """
     config = {
         "allow_null": True,
         "calendar_popup": True,
@@ -468,6 +534,13 @@ def field_to_datetime(layer: Any, field_name: str) -> None:
 
 
 def field_readonly(layer: Any, field_name: str, option: bool = True) -> None:
+    """
+
+    :param layer:
+    :param field_name:
+    :param option:
+    :return:
+    """
     if layer.type() != QgsMapLayer.VectorLayer:
         return
 

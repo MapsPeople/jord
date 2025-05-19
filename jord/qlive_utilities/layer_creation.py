@@ -139,7 +139,7 @@ def add_qgis_single_feature_layer(
         QgsWkbTypes.GeometryCollectionZM,
     ):
         for g in geom.asGeometryCollection():  # TODO: Look into recursion?
-            uri = QgsWkbTypes.translatedDisplayString(g.wkbType())
+            uri = QgsWkbTypes.displayString(g.wkbType())
 
             if True:
                 logger.error(f"{g},{uri=}")
@@ -407,7 +407,7 @@ def add_qgis_multi_feature_layer(
         if geom.wkbType() == QgsWkbTypes.NoGeometry:
             continue
 
-        geom_type_ = QgsWkbTypes.translatedDisplayString(geom.wkbType())
+        geom_type_ = QgsWkbTypes.displayString(geom.wkbType())
 
         if geom_type is None:
             geom_type = geom_type_
@@ -427,7 +427,7 @@ def add_qgis_multi_feature_layer(
         ):
             for g in geom.asGeometryCollection():  # TODO: Look into recursion?
 
-                sub_type = QgsWkbTypes.translatedDisplayString(g.wkbType())
+                sub_type = QgsWkbTypes.displayString(g.wkbType())
 
                 return_collection.extend(
                     add_qgis_multi_feature_layer(
