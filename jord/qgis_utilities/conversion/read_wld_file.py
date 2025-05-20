@@ -1,7 +1,8 @@
 from pathlib import Path
 from typing import Any
 
-from PyQt5.QtGui import QTransform
+# noinspection PyUnresolvedReferences
+from qgis.PyQt.QtGui import QTransform
 
 __all__ = ["read_wld_file"]
 

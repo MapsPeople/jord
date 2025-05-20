@@ -15,6 +15,7 @@ from typing import (
 
 import numpy
 import pandas
+import shapely
 from pandas.core.generic import NDFrame
 
 ADD_STRING_LEN = True
@@ -88,6 +89,23 @@ def solve_qgis_type(d: Any) -> Optional[str]:
 
         elif isinstance(d, datetime.time):
             return "time"
+
+        elif isinstance(d, shapely.Polygon):
+            return "geometry"  # "polygon"
+
+        elif isinstance(d, shapely.MultiPolygon):
+            return "geometry"  # "multipolygon"
+
+        elif isinstance(d, shapely.LineString):
+            return "geometry"  # "linestring"
+        elif isinstance(d, shapely.MultiLineString):
+            return "geometry"  # "multilinestring"
+
+        elif isinstance(d, shapely.MultiPoint):
+            return "geometry"  # "multipoint"
+
+        elif isinstance(d, shapely.Point):
+            return "geometry"  # "point"
 
         elif isinstance(d, str):
             if False:

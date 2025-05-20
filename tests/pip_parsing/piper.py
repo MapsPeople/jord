@@ -13,7 +13,6 @@ __all__ = [
     "is_package_updatable",
 ]
 
-import cgi
 import ensurepip
 import json
 import logging
@@ -291,6 +290,8 @@ def get_charset(headers, default: str = "utf-8"):
         charset = headers.getparam("charset")
         if charset is None:
             ct_header = headers.getheader("Content-Type")
+            import cgi
+
             content_type, params = cgi.parse_header(ct_header)
             charset = params.get("charset", default)
     return charset

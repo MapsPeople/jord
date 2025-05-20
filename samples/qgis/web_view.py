@@ -6,10 +6,12 @@ __doc__ = r"""
 
 from typing import Any
 
-from PyQt5.QtCore import (
+from PyQt5.QtWebKitWidgets import QWebView
+
+# noinspection PyUnresolvedReferences
+from qgis.PyQt.QtCore import (
     QUrl,
 )
-from PyQt5.QtWebKitWidgets import QWebView
 
 
 def get_web_view(parent: Any) -> QWebView:

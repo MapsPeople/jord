@@ -16,7 +16,8 @@ if __name__ == "__main__":
 
         For Esri basemaps you will need a valid ArcGIS online subscription to use the maps.
         """
-        from PyQt5.QtCore import QSettings
+        # noinspection PyUnresolvedReferences
+        from qgis.PyQt.QtCore import QSettings
 
         """
 connection_type
@@ -196,7 +197,8 @@ zmin
                 "",
                 "",
                 "Requires ArcGIS Onlinesubscription",
-                "http://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/%7Bz%7D/%7By%7D/%7Bx%7D",
+                "http://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer"
+                "/tile/%7Bz%7D/%7By%7D/%7Bx%7D",
                 "",
                 "16",
                 "0",
@@ -209,7 +211,8 @@ zmin
                 "",
                 "",
                 "Requires ArcGIS Onlinesubscription",
-                "http://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/%7Bz%7D/%7By%7D/%7Bx%7D",
+                "http://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer"
+                "/tile/%7Bz%7D/%7By%7D/%7Bx%7D",
                 "",
                 "16",
                 "0",
@@ -222,7 +225,8 @@ zmin
                 "",
                 "",
                 "Requires ArcGIS Onlinesubscription",
-                "http://services.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/%7Bz%7D/%7By%7D/%7Bx%7D",
+                "http://services.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/%7Bz%7D"
+                "/%7By%7D/%7Bx%7D",
                 "",
                 "12",
                 "0",
@@ -235,7 +239,8 @@ zmin
                 "",
                 "",
                 "Requires ArcGIS Onlinesubscription",
-                "https://services.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/%7Bz%7D/%7By%7D/%7Bx%7D",
+                "https://services.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile"
+                "/%7Bz%7D/%7By%7D/%7Bx%7D",
                 "",
                 "10",
                 "0",
@@ -248,7 +253,8 @@ zmin
                 "",
                 "",
                 "Requires ArcGIS Onlinesubscription",
-                "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/%7Bz%7D/%7By%7D/%7Bx%7D",
+                "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/%7Bz%7D/%7By"
+                "%7D/%7Bx%7D",
                 "",
                 "17",
                 "0",
@@ -261,7 +267,8 @@ zmin
                 "",
                 "",
                 "Requires ArcGIS Onlinesubscription",
-                "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/%7Bz%7D/%7By%7D/%7Bx%7D",
+                "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/%7Bz%7D"
+                "/%7By%7D/%7Bx%7D",
                 "",
                 "17",
                 "0",
@@ -274,7 +281,8 @@ zmin
                 "",
                 "",
                 "Requires ArcGIS Onlinesubscription",
-                "https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/%7Bz%7D/%7By%7D/%7Bx%7D",
+                "https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/%7Bz%7D"
+                "/%7By%7D/%7Bx%7D",
                 "",
                 "13",
                 "0",
@@ -287,7 +295,8 @@ zmin
                 "",
                 "",
                 "Requires ArcGIS Onlinesubscription",
-                "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/%7Bz%7D/%7By%7D/%7Bx%7D",
+                "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer"
+                "/tile/%7Bz%7D/%7By%7D/%7Bx%7D",
                 "",
                 "20",
                 "0",
@@ -300,7 +309,8 @@ zmin
                 "",
                 "",
                 "Requires ArcGIS Onlinesubscription",
-                "http://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/%7Bz%7D/%7By%7D/%7Bx%7D",
+                "http://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/%7Bz%7D"
+                "/%7By%7D/%7Bx%7D",
                 "",
                 "20",
                 "0",
