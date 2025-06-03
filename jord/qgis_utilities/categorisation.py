@@ -157,7 +157,8 @@ def styled_field_value_categorised(
     expression_str = f'represent_value("{field_name}")'
     # expression_str_unquoted = f'represent_value({field_name})'
 
-    cats = QgsVectorLayerUtils.getValues(layer, expression_str, selectedOnly=False)[0]
+    asd = QgsVectorLayerUtils.getValues(layer, expression_str, selectedOnly=False)
+    cats = asd[0]
 
     if True:
         render_categories = []
