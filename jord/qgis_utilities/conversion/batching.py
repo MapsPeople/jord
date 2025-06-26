@@ -23,7 +23,13 @@ __all__ = ["transform_features", "transform_sub_tree_features"]
 
 
 def transform_sub_tree_features(
-    selected_nodes: Union[Any, Collection[Any]],
+    selected_nodes: Union[
+        Any,
+        Collection[Any],
+        # QgsLayerTreeGroup,
+        # QgsLayerTreeLayer,
+        # QgsLayerTreeNode
+    ],
     transformer: QgsGcpGeometryTransformer,
     pre_transformer: Optional[Any] = None,
 ) -> None:

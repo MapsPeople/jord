@@ -4,6 +4,9 @@ from itertools import cycle
 from typing import Any, Callable, Generator, Iterable, Sized
 
 # noinspection PyUnresolvedReferences
+from qgis.PyQt.QtCore import QVariant
+
+# noinspection PyUnresolvedReferences
 from qgis.PyQt.QtGui import QColor
 
 # noinspection PyUnresolvedReferences
@@ -131,7 +134,7 @@ def categorise_layer(
         set_symbol_styling(color_iter, opacity, outline_only, outline_width, sym)
 
         render_categories.append(
-            QgsRendererCategory("", symbol=sym, label="default", render=True)
+            QgsRendererCategory(QVariant(""), symbol=sym, label="default", render=True)
         )
 
         if False:
@@ -200,7 +203,7 @@ def styled_field_value_categorised(
 
                 render_categories.append(
                     QgsRendererCategory(
-                        ref, symbol=sym, label=cat, render=True, uuid=ref
+                        QVariant(ref), symbol=sym, label=str(cat), render=True, uuid=ref
                     )
                 )
                 added_references.add(ref)
@@ -208,7 +211,7 @@ def styled_field_value_categorised(
         sym = QgsSymbol.defaultSymbol(layer.geometryType())
         render_categories.append(
             QgsRendererCategory(
-                None,
+                QVariant(None),
                 symbol=sym,
                 label="",
                 render=True,
