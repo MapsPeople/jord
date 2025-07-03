@@ -27,7 +27,14 @@ from jord.shapely_utilities.lines import (
 from jord.shapely_utilities.morphology import closing, erode, pro_opening
 from jord.shapely_utilities.subdivision import subdivide
 
-__all__ = ["desliver"]
+__all__ = [
+    "desliver",
+    "cut_polygon",
+    "multi_line_extend",
+    "desliver_center_divide",
+    "desliver_center_divide_shared",
+    "desliver_least_intersectors_first",
+]
 
 from jord.shapely_utilities.projection import (
     get_min_max_projected_line,
