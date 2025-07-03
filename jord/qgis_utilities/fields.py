@@ -114,11 +114,18 @@ ValueRelation
 HIDDEN_WIDGET = QgsEditorWidgetSetup("Hidden", {})
 CHECKBOX_WIDGET = QgsEditorWidgetSetup(
     "CheckBox",
+    {"CheckedState": "True", "UncheckedState": "False", "TextDisplayMethod": 0},
+)
+NULLABLE_CHECKBOX_WIDGET = QgsEditorWidgetSetup(
+    "CheckBox",
     {
-        "Checked state": "True",
-        "Unchecked state": "False",
+        "CheckedState": "True",
+        "UncheckedState": "False",
+        "AllowNullState": True,
+        "TextDisplayMethod": 0,
     },
 )
+
 UNIQUE_VALUES_WIDGET = QgsEditorWidgetSetup(
     "UniqueValues",
     {"Editable": True},
@@ -132,7 +139,7 @@ def set_field_widget(layers: Any, field_name: str, form_widget: Any) -> None:
     https://gis.stackexchange.com/questions/470963/setting-dropdown-on-feature-attribute-form-using-plugin
 
 
-    :param layer:
+    :param layers:
     :param field_name:
     :param form_widget:
     :return:
@@ -304,9 +311,12 @@ def make_field_default(
                 )
 
 
-def make_field_boolean(layers: Sequence[Any], field_name: str) -> None:
+def make_field_boolean(
+    layers: Sequence[Any], field_name: str, nullable: bool = True
+) -> None:
     """
 
+    :param nullable:
     :param layers:
     :param field_name:
     :return:
@@ -317,14 +327,17 @@ def make_field_boolean(layers: Sequence[Any], field_name: str) -> None:
     for layers_inner in layers:
         if layers_inner:
             if isinstance(layers_inner, Iterable):
-                for layers in layers_inner:
-                    if layers:
-                        idx = layers.fields().indexFromName(field_name)
+                for layer in layers_inner:
+                    if layer:
+                        idx = layer.fields().indexFromName(field_name)
 
                         if idx < 0:
                             continue
 
-                        layers.setDefaultValueDefinition(idx, CHECKBOX_WIDGET)
+                        layer.setEditorWidgetSetup(
+                            idx,
+                            NULLABLE_CHECKBOX_WIDGET if nullable else CHECKBOX_WIDGET,
+                        )
             else:
                 idx = layers_inner.fields().indexFromName(field_name)
 
@@ -333,7 +346,7 @@ def make_field_boolean(layers: Sequence[Any], field_name: str) -> None:
 
                 layers_inner.setEditorWidgetSetup(
                     idx,
-                    CHECKBOX_WIDGET,
+                    NULLABLE_CHECKBOX_WIDGET if nullable else CHECKBOX_WIDGET,
                 )
 
 
@@ -452,7 +465,7 @@ def make_value_relation_widget(
     target_key_field_name: str = "key",
     target_value_field_name: str = "name",
     use_completer: bool = False,
-    order_by_value: bool = False,
+    order_by_value: bool = True,
     allow_null_values: bool = False,
     allow_multiple_values: bool = False
 ) -> Any:
