@@ -1,6 +1,5 @@
 import datetime
 import logging
-import math
 from typing import (
     Any,
     Collection,
@@ -32,7 +31,9 @@ __all__ = [
 logger = logging.getLogger(__name__)
 
 
-def solve_qgis_type(d: Any) -> Optional[str]:
+def solve_qgis_type(
+    d: Any, floating_point_length: int = 20, floating_point_precision: int = 8
+) -> Optional[str]:
     """
     Does not support size/length yet...
 
@@ -62,6 +63,8 @@ def solve_qgis_type(d: Any) -> Optional[str]:
     Map - map - O
     Geometry - geometry - O
 
+    :param floating_point_precision:
+    :param floating_point_length:
     :param d:
     :return:
     """
@@ -72,8 +75,8 @@ def solve_qgis_type(d: Any) -> Optional[str]:
         if isinstance(d, int):
             return "integer"
 
-        elif isinstance(d, float) and (not math.isnan(d)):
-            return "double"
+        elif isinstance(d, float):  # and (math.isnan(d)):
+            return f"double"  # ({floating_point_length,floating_point_precision})" #'real' #"double"
 
         elif isinstance(d, bytes):
             return "binary"
@@ -81,7 +84,13 @@ def solve_qgis_type(d: Any) -> Optional[str]:
         elif isinstance(d, (list, tuple, set)):  # ASSUME IS STRINGS
             return "stringlist"
 
-        elif isinstance(d, datetime.datetime):
+        elif isinstance(
+            d,
+            (
+                datetime.datetime
+                #    , pandas.NaT
+            ),
+        ):
             return "datetime"
 
         elif isinstance(d, datetime.date):
@@ -98,6 +107,7 @@ def solve_qgis_type(d: Any) -> Optional[str]:
 
         elif isinstance(d, shapely.LineString):
             return "geometry"  # "linestring"
+
         elif isinstance(d, shapely.MultiLineString):
             return "geometry"  # "multilinestring"
 
@@ -144,42 +154,48 @@ def solve_qgis_type(d: Any) -> Optional[str]:
 
 
 def solve_attribute_uri(
-    attr_type_sampler: Generator, columns: Collection
+    attr_type_sampler: Generator,
+    columns: Collection,
+    floating_point_length: int = 20,
+    floating_point_precision: int = 8,
 ) -> Tuple[Mapping[str, str], Mapping[str, str], int]:
+
     sample_row = next(attr_type_sampler)
     num_cols = len(sample_row)
 
     fields = {}
     field_type_configuration = {}
-    for k, v in sample_row.items():
-        a = solve_qgis_type(v)
+    for data_key, data_value in sample_row.items():
+        data_type = solve_qgis_type(data_value)
 
-        if fields.get(k) is None:
-            fields[k] = a
+        if fields.get(data_key) is None:
+            fields[data_key] = data_type
 
-        if a:
-            if field_type_configuration.get(k) is None:
-                field_type_configuration[k] = solve_type_configuration(v, k, columns)
+        if data_type:
+            if field_type_configuration.get(data_key) is None:
+                field_type_configuration[data_key] = solve_type_configuration(
+                    data_value, data_key, columns
+                )
 
-    for r in attr_type_sampler:
+    for row in attr_type_sampler:
         _solved = True
-        for k in fields.keys():
-            if fields.get(k) is None:
+        for data_key in fields.keys():
+            if fields.get(data_key) is None:
                 _solved = False
 
         if _solved:
             break
 
-        for k, v in r.items():
-            a = solve_qgis_type(v)
+        for data_key, data_value in row.items():
+            data_type = solve_qgis_type(data_value)
 
-            if fields.get(k) is None:
-                fields[k] = a
+            if fields.get(data_key) is None:
+                fields[data_key] = data_type
 
-            if a:
-                if field_type_configuration.get(k) is None:
-                    field_type_configuration[k] = solve_type_configuration(
-                        v, k, columns
+            if data_type:
+                if field_type_configuration.get(data_key) is None:
+                    field_type_configuration[data_key] = solve_type_configuration(
+                        data_value, data_key, columns
                     )
 
     for f in list(fields.keys()):
@@ -205,7 +221,7 @@ def solve_field_uri(
 
 
 def to_string_if_not_of_exact_type(
-    gen: Iterable, type_: Iterable[type] = (int, float, str, bool)
+    gen: Iterable, type_: Iterable[type] = (int, float, str, bool, datetime.datetime)
 ) -> Union[str, Any]:
     """
 
@@ -226,35 +242,44 @@ def to_string_if_not_of_exact_type(
                 )  # TODO: SHOULD ALSO BE CONVERTED?
             else:
                 yield v
-        elif all([type(v) != t for t in type_]):
+        elif pandas.isna(v):
+            yield None
+        elif all([type(v) != t for t in type_]):  # UNKNOWN TYPE
             yield str(v)
         else:
             yield v
 
 
 def solve_type_configuration(
-    d: Any,
-    k: Optional[str],
+    data_value: Any,
+    data_key: Optional[str],
     columns: Optional[List],
     allocation_multiplier: Optional[int] = 2,
+    floating_point_length: int = 20,
+    floating_point_precision: int = 8,
 ) -> Optional[str]:
     """
 
-    :param d:
-    :param k:
+      :param floating_point_length:
+    :param floating_point_precision:
+    :param data_value:
+    :param data_key:
     :param columns:
     :param allocation_multiplier:
     :return:
     """
-    if isinstance(d, str):
-        a = len(d)
+    if isinstance(data_value, float):
+        return f"{floating_point_length},{floating_point_precision}"
 
-        if k and columns:
+    if isinstance(data_value, str):
+        a = len(data_value)
+
+        if data_key and columns:
             max_len = a
 
             if isinstance(columns, Iterable):
                 for cols in columns:
-                    c = cols[k]
+                    c = cols[data_key]
 
                     if isinstance(c, str):
                         max_len = max(max_len, len(c))

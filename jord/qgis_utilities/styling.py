@@ -111,18 +111,29 @@ def set_layer_rendering_scale(
     :param min_ratio:
     :return:
     """
+
+    logger.warning(f"Setting layer rendering scale {max_ratio=} {min_ratio=}")
+
+    if layers is None:
+        return
+
     if not isinstance(
         layers, Iterable
     ):  # Handle both single layer and iterable of layers
         layers = [layers]
+
+    assert max_ratio <= 1
+    assert min_ratio <= max_ratio
 
     for layer in layers:
         if not layer:
             continue
 
         layer.setScaleBasedVisibility(True)
+        layer.setMinimumScale(1.0 / min_ratio)
         layer.setMaximumScale(max_ratio)
-        layer.setMinimumScale(1 / min_ratio)
+
+        # Calling setMinimumScale() places a restriction on the acceptable maximum scale for the widget, and will alter any previously set maximum scale to pass this constraint. Always call setMinimumScale() before setMaximumScale() when restoring a scale range in the widget, or use the convenience method setScaleRange() instead.
 
 
 def set_label_styling(
@@ -137,8 +148,13 @@ def set_label_styling(
     background_svg: str = None,
     html_format: Optional[str] = None,
 ):
+    logger.warning(f"Setting layer label rendering scale {max_ratio=} {min_ratio=}")
+
     if layers is None:
         return
+
+    assert max_ratio <= 1
+    assert min_ratio <= max_ratio
 
     # Handle both single layer and iterable of layers
     if not isinstance(layers, Iterable):
@@ -184,8 +200,8 @@ def set_label_styling(
         label_settings.setFormat(format)
 
         label_settings.scaleVisibility = True
+        label_settings.minimumScale = 1.0 / min_ratio  # Furthest zoom level
         label_settings.maximumScale = max_ratio  # Closest zoom level
-        label_settings.minimumScale = 1 / min_ratio  # Furthest zoom level
 
         label_settings.placement = QgsPalLayerSettings.AroundPoint
         label_settings.priority = 5

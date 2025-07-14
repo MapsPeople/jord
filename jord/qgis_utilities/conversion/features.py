@@ -1,8 +1,9 @@
 import logging
 from typing import Any, Mapping, Optional, Tuple
 
+
 # noinspection PyUnresolvedReferences
-from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtCore import QVariant, QDateTime
 
 import shapely
 
@@ -25,6 +26,7 @@ __all__ = [
     "STR_NONE_VALUE",
     "parse_field",
     "extract_field_value",
+    "qgs_geometry_to_shapely",
     "extract_layer_data_single",
 ]
 
@@ -130,6 +132,51 @@ def layer_data_generator(layer_tree_layer: Any) -> Tuple:
         )
 
 
+def qgs_geometry_to_shapely(
+    geom: Any,
+    *,
+    geom_id: Optional[str] = None,
+    validate: bool = True,
+) -> Optional[shapely.geometry.base.BaseGeometry]:
+    """
+
+    :param geom:
+    :param geom_id:
+    :param validate:
+    :return:
+    """
+    if geom is not None:
+        if validate:
+            if not geom.isGeosValid():
+                msg = (
+                    f"{geom_id} is not a valid geometry, {geom.lastError()}\n"
+                    f"{geom.validateGeometry()}"
+                )
+                logger.error(msg)
+
+                if True:
+                    raise GeometryIsInvalidError(msg)
+                else:
+                    geom = geom.makeValid()
+
+        if validate:
+            if geom.isNull() or geom.isEmpty():
+                raise GeometryIsEmptyError(f"{geom_id} is empty")
+        else:
+            if geom.isNull() or geom.isEmpty():
+                return None
+
+        geom_wkb = geom.asWkb()
+
+        if geom_wkb is not None:
+            if not isinstance(geom_wkb, bytes):
+                geom_wkb = bytes(geom_wkb)
+
+            return shapely.from_wkb(geom_wkb)
+
+    return None
+
+
 def feature_to_shapely(
     layer_feature: Any,
     validate: bool = True,
@@ -140,34 +187,9 @@ def feature_to_shapely(
     :param layer_feature:
     :return:
     """
-    feature_geom = layer_feature.geometry()
-    if feature_geom is not None:
-        if validate:
-            if not feature_geom.isGeosValid():
-                msg = (
-                    f"{layer_feature.id()=} is not a valid geometry, {feature_geom.lastError()}\n"
-                    f"{feature_geom.validateGeometry()}"
-                )
-                logger.error(msg)
-
-                if True:
-                    raise GeometryIsInvalidError(msg)
-                else:
-                    feature_geom = feature_geom.makeValid()
-
-        if validate:
-            if feature_geom.isNull() or feature_geom.isEmpty():
-                raise GeometryIsEmptyError(f"{layer_feature.id()=} is empty")
-        else:
-            if feature_geom.isNull() or feature_geom.isEmpty():
-                return None
-
-        geom_wkb = feature_geom.asWkb()
-        if geom_wkb is not None:
-            if not isinstance(geom_wkb, bytes):
-                geom_wkb = bytes(geom_wkb)
-
-            return shapely.from_wkb(geom_wkb)
+    return qgs_geometry_to_shapely(
+        layer_feature.geometry(), geom_id=f"{layer_feature.id()=}"
+    )
 
 
 def extract_layer_data_single(layer_tree_layer: Any) -> Tuple:
@@ -256,6 +278,9 @@ def extract_field_value(feature_attributes: Mapping[str, Any], field_name: str) 
 
     if field_value is None:
         ...
+
+    elif isinstance(field_value, QDateTime):
+        field_value = field_value.toPyDateTime()
 
     elif isinstance(field_value, str):
         v = field_value
