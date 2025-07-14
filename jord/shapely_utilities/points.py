@@ -12,6 +12,7 @@ __all__ = [
     "azimuth",
     "shift_point",
     "closest_object",
+    "off_center_point_inside_polygon",
 ]
 
 
@@ -141,6 +142,20 @@ def azimuth(point1: Point, point2: Point) -> float:
     return (
         numpy.degrees(angle) if angle >= 0 else numpy.degrees(angle) + 360
     ) % 180  # Modulo is used on the angle to produce a result between 0 and 180 degrees
+
+
+def off_center_point_inside_polygon(polygon: shapely.Polygon) -> shapely.Point:
+
+    rep_point = polygon.representative_point()
+    for x, y in zip(*polygon.exterior.coords.xy):
+
+        line = shapely.LineString([shapely.Point(x, y), rep_point])
+
+        point = line.interpolate(0.5, normalized=True)
+        if point.within(polygon):
+            return point
+
+    return rep_point
 
 
 if __name__ == "__main__":
