@@ -112,7 +112,7 @@ def set_layer_rendering_scale(
     :return:
     """
 
-    logger.warning(f"Setting layer rendering scale {max_ratio=} {min_ratio=}")
+    # logger.warning(f"Setting layer rendering scale {max_ratio=} {min_ratio=}")
 
     if layers is None:
         return
@@ -148,7 +148,7 @@ def set_label_styling(
     background_svg: str = None,
     html_format: Optional[str] = None,
 ):
-    logger.warning(f"Setting layer label rendering scale {max_ratio=} {min_ratio=}")
+    # logger.warning(f"Setting layer label rendering scale {max_ratio=} {min_ratio=}")
 
     if layers is None:
         return
