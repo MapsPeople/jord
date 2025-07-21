@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Mapping, Optional, Tuple
+from typing import Any, Generator, Mapping, Optional, Tuple
 
 
 # noinspection PyUnresolvedReferences
@@ -56,7 +56,13 @@ def parse_q_value(v: Any) -> Any:
     # noinspection PyUnresolvedReferences
     from qgis.PyQt.QtCore import QVariant
 
-    if isinstance(v, QVariant):
+    # noinspection PyUnresolvedReferences
+    from qgis.PyQt.QtGui import QColor
+
+    if isinstance(v, QColor):
+        v = v.name()
+
+    elif isinstance(v, QVariant):
         if v.isNull():
             v = None
         else:
@@ -102,7 +108,9 @@ def extract_layer_attributes(layer_tree_layer: Any) -> list[dict[str, Any]]:
     raise MissingFeatureError(f"no feature was not found for {layer_tree_layer.name()}")
 
 
-def layer_data_generator(layer_tree_layer: Any) -> Tuple:
+def layer_data_generator(
+    layer_tree_layer: Any,
+) -> Generator[tuple[dict[str, Any], Any], Any, None]:
     """
 
     :param layer_tree_layer:
