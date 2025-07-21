@@ -12,7 +12,8 @@ We welcome pull requests.
 
 ## Issues
 
-We use GitHub issues to track public bugs. Please ensure your description is clear and has sufficient instructions to be
+We use GitHub issues to track public bugs. Please ensure your description is clear and has sufficient
+instructions to be
 able to reproduce the issue.
 
 ## Coding Style
@@ -21,5 +22,6 @@ able to reproduce the issue.
 
 ## License
 
-By contributing to the [Heimdallr](https://github.com/aivclab/heimdallr) platform, you agree that your contributions
+By contributing to the [Heimdallr](https://github.com/aivclab/heimdallr) platform, you agree that your
+contributions
 will be licensed under the LICENSE file in the root directory of this repository.

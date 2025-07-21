@@ -2,7 +2,11 @@ import logging
 from typing import Optional
 
 import shapely
-from shapely.geometry.base import BaseGeometry
+import shapely.geometry
+from shapely.validation import make_valid
+from warg import passes_kws_to
+
+from .uniformity import ensure_cw_poly
 
 __all__ = [
     "closing",
@@ -20,11 +24,6 @@ __all__ = [
     "collapse_duplicate_vertices",
 ]
 
-from shapely.validation import make_valid
-
-from warg import passes_kws_to
-
-from .uniformity import ensure_cw_poly
 
 FALLBACK_LINESTRING_CAPSTYLE = shapely.BufferCapStyle.square  # CAN BE OVERRIDDEN
 FALLBACK_POINT_CAPSTYLE = shapely.BufferCapStyle.round  # CAN BE OVERRIDDEN
@@ -36,7 +35,7 @@ logger = logging.getLogger(__name__)
 
 @passes_kws_to(shapely.geometry.base.BaseGeometry.buffer)
 def morphology_buffer(
-    geom: BaseGeometry,
+    geom: shapely.geometry.base.BaseGeometry,
     distance: float = DEFAULT_DISTANCE,
     cap_style: shapely.BufferCapStyle = shapely.BufferCapStyle.flat,
     join_style: shapely.BufferJoinStyle = shapely.BufferJoinStyle.mitre,
@@ -100,8 +99,10 @@ def morphology_buffer(
 
 @passes_kws_to(morphology_buffer)
 def erosion(
-    geom: BaseGeometry, distance: float = DEFAULT_DISTANCE, **kwargs
-) -> BaseGeometry:
+    geom: shapely.geometry.base.BaseGeometry,
+    distance: float = DEFAULT_DISTANCE,
+    **kwargs,
+) -> shapely.geometry.base.BaseGeometry:
     """
 
     :param distance:
@@ -115,8 +116,10 @@ def erosion(
 
 @passes_kws_to(morphology_buffer)
 def dilation(
-    geom: BaseGeometry, distance: float = DEFAULT_DISTANCE, **kwargs
-) -> BaseGeometry:
+    geom: shapely.geometry.base.BaseGeometry,
+    distance: float = DEFAULT_DISTANCE,
+    **kwargs,
+) -> shapely.geometry.base.BaseGeometry:
     """
 
     :param cap_style:
@@ -130,7 +133,9 @@ def dilation(
 
 
 @passes_kws_to(shapely.geometry.base.BaseGeometry.buffer)
-def closing(geom: BaseGeometry, **kwargs) -> BaseGeometry:
+def closing(
+    geom: shapely.geometry.base.BaseGeometry, **kwargs
+) -> shapely.geometry.base.BaseGeometry:
     """
 
     :param geom: The geometry to be closed
@@ -140,7 +145,9 @@ def closing(geom: BaseGeometry, **kwargs) -> BaseGeometry:
 
 
 @passes_kws_to(shapely.geometry.base.BaseGeometry.buffer)
-def opening(geom: BaseGeometry, **kwargs) -> BaseGeometry:
+def opening(
+    geom: shapely.geometry.base.BaseGeometry, **kwargs
+) -> shapely.geometry.base.BaseGeometry:
     """
 
     :param geom: The geometry to be opened
@@ -150,7 +157,9 @@ def opening(geom: BaseGeometry, **kwargs) -> BaseGeometry:
 
 
 @passes_kws_to(shapely.geometry.base.BaseGeometry.buffer)
-def pro_closing(geom: BaseGeometry, **kwargs) -> BaseGeometry:
+def pro_closing(
+    geom: shapely.geometry.base.BaseGeometry, **kwargs
+) -> shapely.geometry.base.BaseGeometry:
     """
       Remove Salt and Pepper
 
@@ -190,7 +199,9 @@ def pro_closing(geom: BaseGeometry, **kwargs) -> BaseGeometry:
 
 
 @passes_kws_to(shapely.geometry.base.BaseGeometry.buffer)
-def pro_opening(geom: BaseGeometry, **kwargs) -> BaseGeometry:
+def pro_opening(
+    geom: shapely.geometry.base.BaseGeometry, **kwargs
+) -> shapely.geometry.base.BaseGeometry:
     """
       Remove Salt and Pepper
 
@@ -236,8 +247,8 @@ close = closing
 
 
 def zero_buffer(
-    geom: BaseGeometry,
-) -> BaseGeometry:
+    geom: shapely.geometry.base.BaseGeometry,
+) -> shapely.geometry.base.BaseGeometry:
     return dilate(geom, distance=0)
 
 

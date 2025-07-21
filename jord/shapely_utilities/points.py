@@ -2,8 +2,8 @@ from typing import Generator, Iterable, List, Optional, Sequence, Tuple, Union
 
 import numpy
 import shapely
+import shapely.geometry
 from shapely.geometry import LineString, MultiPoint, Point
-from shapely.geometry.base import BaseGeometry
 from warg import Number
 
 __all__ = [
@@ -66,8 +66,8 @@ def nearest_neighbor_within(
 
 
 def closest_object(
-    geometries: Iterable[BaseGeometry], point: Point
-) -> Tuple[BaseGeometry, float, int]:
+    geometries: Iterable[shapely.geometry.base.BaseGeometry], point: Point
+) -> Tuple[shapely.geometry.base.BaseGeometry, float, int]:
     """
     Find the nearest geometry among a list, measured from fixed point.
 

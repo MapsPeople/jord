@@ -16,8 +16,9 @@ __all__ = [
 from collections import deque
 from typing import List, Sequence, Union
 
+import shapely.geometry
 from shapely.geometry import LineString, MultiLineString, Point, Polygon
-from shapely.geometry.base import BaseGeometry, BaseMultipartGeometry
+from shapely.geometry.base import BaseMultipartGeometry
 
 
 def split_line_string(line_string: LineString) -> Sequence[LineString]:
@@ -95,7 +96,9 @@ def fix_starting_point(polygon_pieces: Sequence[Polygon]) -> Sequence[Polygon]:
         return polygon_pieces  # We probably cut exactly at the starting point.
 
 
-def adjust_line_end(line: LineString, end: BaseGeometry) -> LineString:
+def adjust_line_end(
+    line: LineString, end: shapely.geometry.base.BaseGeometry
+) -> LineString:
     """
     Reverse line if necessary to ensure that it ends near end.
 
@@ -114,8 +117,8 @@ def adjust_line_end(line: LineString, end: BaseGeometry) -> LineString:
 
 
 def ensure_list_of_geometries(
-    thing: Union[BaseGeometry, BaseMultipartGeometry],
-) -> List[BaseGeometry]:
+    thing: Union[shapely.geometry.base.BaseGeometry, BaseMultipartGeometry],
+) -> List[shapely.geometry.base.BaseGeometry]:
     """
 
     :param thing:

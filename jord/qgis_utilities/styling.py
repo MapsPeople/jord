@@ -232,7 +232,6 @@ def make_line_symbol(
     culling_mode, edge_color, edge_width, extrusion, facades, offset
 ) -> Any:
     # ->q3d.QgsPolygon3DSymbol:
-    import qgis._3d as q3d
 
     symbol = q3d.QgsLine3DSymbol()
     symbol.setWidth(edge_width)
@@ -247,7 +246,6 @@ def make_point_symbol(
     culling_mode, edge_color, edge_width, extrusion, facades, offset
 ) -> Any:
     # ->q3d.QgsPolygon3DSymbol:
-    import qgis._3d as q3d
 
     symbol = q3d.QgsPoint3DSymbol()
     # symbol.setShape(q3d.QgsSymbol3DShape.Cylinder)
@@ -369,7 +367,6 @@ def apply_common_symbol_settings(symbol) -> None:
 
 
 def apply_material(color, symbol) -> None:
-    import qgis._3d as q3d
 
     material_settings = q3d.QgsPhongMaterialSettings()
 

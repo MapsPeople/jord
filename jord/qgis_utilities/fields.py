@@ -16,7 +16,6 @@ from qgis.core import (
 __all__ = [
     "set_field_widget",
     "make_field_unique",
-    "HIDDEN_WIDGET",
     "make_field_not_null",
     "make_field_default",
     "make_field_boolean",
@@ -30,6 +29,12 @@ __all__ = [
     "field_readonly",
     "make_external_resource_widget",
 ]
+
+from jord.qgis_utilities.helpers.widgets import (
+    CHECKBOX_WIDGET,
+    NULLABLE_CHECKBOX_WIDGET,
+    UNIQUE_VALUES_WIDGET,
+)
 
 
 class DocumentViewerEnum(IntEnum):
@@ -110,26 +115,6 @@ ValueMap
 ValueRelation
 
 """
-
-HIDDEN_WIDGET = QgsEditorWidgetSetup("Hidden", {})
-CHECKBOX_WIDGET = QgsEditorWidgetSetup(
-    "CheckBox",
-    {"CheckedState": "True", "UncheckedState": "False", "TextDisplayMethod": 0},
-)
-NULLABLE_CHECKBOX_WIDGET = QgsEditorWidgetSetup(
-    "CheckBox",
-    {
-        "CheckedState": "True",
-        "UncheckedState": "False",
-        "AllowNullState": True,
-        "TextDisplayMethod": 0,
-    },
-)
-
-UNIQUE_VALUES_WIDGET = QgsEditorWidgetSetup(
-    "UniqueValues",
-    {"Editable": True},
-)
 
 logger = logging.getLogger(__name__)
 

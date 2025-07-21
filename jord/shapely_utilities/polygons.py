@@ -2,8 +2,8 @@ import statistics
 from typing import Generator, Iterable, List, Sequence, Tuple, Union
 
 import shapely
+import shapely.geometry
 from shapely import MultiPolygon, Polygon
-from shapely.geometry.base import BaseGeometry
 from warg import Number, pairs
 
 from .base import sanitise
@@ -33,7 +33,9 @@ def polygon_has_interior_rings(polygon: shapely.Polygon) -> bool:
     return len(polygon.interiors) > 0
 
 
-def mean_std_dev_line_length(geom: BaseGeometry) -> Tuple[float, float]:
+def mean_std_dev_line_length(
+    geom: shapely.geometry.base.BaseGeometry,
+) -> Tuple[float, float]:
     """
 
     :return:
@@ -65,7 +67,7 @@ def mean_std_dev_line_length(geom: BaseGeometry) -> Tuple[float, float]:
     )
 
 
-def mean_std_dev_area(geom: BaseGeometry) -> Tuple[float, float]:
+def mean_std_dev_area(geom: shapely.geometry.base.BaseGeometry) -> Tuple[float, float]:
     """
 
     :param geom:
@@ -86,7 +88,9 @@ def mean_std_dev_area(geom: BaseGeometry) -> Tuple[float, float]:
     )
 
 
-def prune_area(geom: BaseGeometry, eps: float = DEFAULT_DISTANCE) -> BaseGeometry:
+def prune_area(
+    geom: shapely.geometry.base.BaseGeometry, eps: float = DEFAULT_DISTANCE
+) -> shapely.geometry.base.BaseGeometry:
     """
 
     :param geom:
@@ -105,7 +109,9 @@ def prune_area(geom: BaseGeometry, eps: float = DEFAULT_DISTANCE) -> BaseGeometr
     return poly_areas
 
 
-def prune_rings(geom: BaseGeometry, eps: float = DEFAULT_DISTANCE) -> BaseGeometry:
+def prune_rings(
+    geom: shapely.geometry.base.BaseGeometry, eps: float = DEFAULT_DISTANCE
+) -> shapely.geometry.base.BaseGeometry:
     """
 
     :param geom:
@@ -230,7 +236,7 @@ def extract_poly_coords(
     return exterior_coords, interior_coords
 
 
-def extract_poly_rings(geom: BaseGeometry) -> Tuple[List, List]:
+def extract_poly_rings(geom: shapely.geometry.base.BaseGeometry) -> Tuple[List, List]:
     """
 
     :param geom:
@@ -307,8 +313,10 @@ def is_polygonal(cleaned):
 
 
 def iter_polygons(
-    _input_geometry: BaseGeometry,
-) -> Union[Generator[shapely.Polygon, None, None], Tuple[BaseGeometry]]:
+    _input_geometry: shapely.geometry.base.BaseGeometry,
+) -> Union[
+    Generator[shapely.Polygon, None, None], Tuple[shapely.geometry.base.BaseGeometry]
+]:
     """
 
     :param _input_geometry:

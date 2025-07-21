@@ -1,7 +1,8 @@
 from pathlib import Path
+from typing import Any, Generator
 
 import pandas
-import shapely.geometry.base
+import shapely
 from shapely import wkb
 
 __all__ = ["load_wkbs_from_csv", "csv_wkt_generator"]
@@ -19,7 +20,7 @@ def load_wkbs_from_csv(
 
 def csv_wkt_generator(
     csv_file_path: Path, geometry_column: str = "Shape"
-) -> shapely.geometry.base.BaseGeometry:
+) -> Generator[shapely.geometry.base.BaseGeometry, Any, None]:
     """
 
     :param csv_file_path:

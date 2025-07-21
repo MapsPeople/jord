@@ -1,15 +1,13 @@
 from enum import Enum
 from pathlib import Path
-from typing import Sequence
+from typing import Any, Generator, Sequence
 
 import pandas
-import shapely.geometry.base
+import shapely
 from pandas import DataFrame
 from shapely import wkt
 
 __all__ = ["load_wkts_from_csv", "csv_wkt_generator", "WktTypeEnum"]
-
-# from sorcery import assigned_names
 
 
 class WktTypeEnum(Enum):
@@ -47,7 +45,7 @@ def load_wkts_from_csv(
 
 def csv_wkt_generator(
     csv_file_path: Path, geometry_column: str = "Shape"
-) -> shapely.geometry.base.BaseGeometry:
+) -> Generator[shapely.geometry.base.BaseGeometry, Any, None]:
     """
 
     :param csv_file_path:
