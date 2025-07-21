@@ -1,8 +1,8 @@
-from typing import List, Iterable, Union, Tuple
+from typing import Iterable, List, Tuple, Union
 
 import numpy
 import pyproj
-from shapely.geometry.base import BaseGeometry
+import shapely.geometry
 from shapely.ops import transform
 
 __all__ = [
@@ -13,10 +13,14 @@ __all__ = [
 
 
 def crs_transform_shapely(
-    geoms: Union[BaseGeometry, Iterable[BaseGeometry]],
+    geoms: Union[
+        shapely.geometry.base.BaseGeometry, Iterable[shapely.geometry.base.BaseGeometry]
+    ],
     from_coordinate_system: str,
     to_coordinate_system: str,
-) -> Union[BaseGeometry, List[BaseGeometry]]:
+) -> Union[
+    shapely.geometry.base.BaseGeometry, List[shapely.geometry.base.BaseGeometry]
+]:
     """
     Project space geometries from one coordinate system to another
 

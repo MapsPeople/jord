@@ -2,9 +2,9 @@ from typing import Iterable, Optional, Sequence, Tuple, Union
 
 import numpy
 import shapely
+import shapely.geometry
 from shapely import LinearRing, MultiLineString
 from shapely.geometry import LineString, Point, Polygon
-from shapely.geometry.base import BaseGeometry
 from warg import Number, pairs
 
 from jord.shapely_utilities.morphology import dilate
@@ -24,7 +24,9 @@ __all__ = [
 SingularExtentGeometry = Union[shapely.LineString, shapely.LinearRing, shapely.Polygon]
 
 
-def project_point_to_object(point: Point, geometry: BaseGeometry) -> Point:
+def project_point_to_object(
+    point: Point, geometry: shapely.geometry.base.BaseGeometry
+) -> Point:
     """Find the nearest point in geometry, measured from given point.
 
     :param point: a shapely Point
@@ -171,8 +173,8 @@ def get_intersection_linear_functions(
 
 
 def nearest_geometry(
-    geometries: Sequence[BaseGeometry], point: Point
-) -> Tuple[BaseGeometry, float, int]:
+    geometries: Sequence[shapely.geometry.base.BaseGeometry], point: Point
+) -> Tuple[shapely.geometry.base.BaseGeometry, float, int]:
     """Find the nearest geometry among a list, measured from fixed point.
 
     :param geometries: a list of shapely geometry objects

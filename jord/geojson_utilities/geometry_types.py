@@ -1,13 +1,13 @@
 from enum import Enum
 
 from geojson import (
-    Point,
-    LineString,
-    Polygon,
-    MultiPoint,
-    MultiLineString,
-    MultiPolygon,
     GeometryCollection,
+    LineString,
+    MultiLineString,
+    MultiPoint,
+    MultiPolygon,
+    Point,
+    Polygon,
 )
 
 __all__ = ["GeoJsonGeometryTypesEnum"]

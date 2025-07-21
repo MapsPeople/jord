@@ -43,6 +43,7 @@ from typing import Iterable, List, Sequence, Tuple, Union
 
 import numpy
 import shapely
+import shapely.geometry
 from shapely.geometry import (
     LineString,
     LinearRing,
@@ -51,7 +52,6 @@ from shapely.geometry import (
     Point,
     box,
 )
-from shapely.geometry.base import BaseGeometry
 
 # from sorcery import assigned_names
 from warg import Number, pairs
@@ -96,13 +96,15 @@ def to_single_line(
 
 
 def to_lines(
-    geoms: Union[Sequence[BaseGeometry], LineString, MultiLineString],
+    geoms: Union[
+        Sequence[shapely.geometry.base.BaseGeometry], LineString, MultiLineString
+    ],
 ) -> List[LineString]:
     """
     Converts Shapely geoms in to Shapely LineString
 
     :param geoms:
-    :type geoms: Sequence[BaseGeometry]
+    :type geoms: Sequence[shapely.geometry.base.BaseGeometry]
     :return:
     :rtype: List[LineString]
     """
@@ -117,7 +119,7 @@ def to_lines(
                 lines.append(g)
             elif isinstance(g, MultiLineString):
                 lines.extend(g.geoms)
-            elif isinstance(g, BaseGeometry):
+            elif isinstance(g, shapely.geometry.base.BaseGeometry):
                 boundary = g.boundary
                 if boundary:
                     if isinstance(boundary, MultiLineString):
@@ -138,7 +140,7 @@ def to_lines(
         lines = geoms.geoms
     elif isinstance(geoms, LineString):
         lines = [geoms]
-    elif isinstance(geoms, BaseGeometry):
+    elif isinstance(geoms, shapely.geometry.base.BaseGeometry):
         boundary = geoms.boundary
         if boundary:
             if isinstance(boundary, MultiLineString):

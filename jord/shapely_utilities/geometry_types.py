@@ -2,14 +2,14 @@ from enum import Enum
 
 import shapely
 from shapely.geometry import (
-    Point,
+    GeometryCollection,
     LineString,
     LinearRing,
-    Polygon,
-    MultiPoint,
     MultiLineString,
+    MultiPoint,
     MultiPolygon,
-    GeometryCollection,
+    Point,
+    Polygon,
 )
 
 __all__ = ["ShapelyGeometryTypesEnum", "is_multi"]

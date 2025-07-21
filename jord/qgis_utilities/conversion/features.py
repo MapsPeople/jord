@@ -1,11 +1,10 @@
 import logging
 from typing import Any, Generator, Mapping, Optional, Tuple
 
+import shapely
 
 # noinspection PyUnresolvedReferences
-from qgis.PyQt.QtCore import QVariant, QDateTime
-
-import shapely
+from qgis.PyQt.QtCore import QDateTime, QVariant
 
 logger = logging.getLogger(__name__)
 

@@ -1,10 +1,10 @@
 from typing import Iterable, List, Tuple, Union
 
 import numpy
+import shapely.geometry
 from numpy import array
 from scipy.spatial import Voronoi
 from shapely.geometry import LineString, MultiLineString, MultiPolygon, Polygon
-from shapely.geometry.base import BaseGeometry
 from shapely.ops import unary_union
 from warg import Number
 
@@ -70,7 +70,7 @@ def find_centerline(
 
 
 def get_voronoi_vertices_and_ridges(
-    _input_geometry: BaseGeometry,
+    _input_geometry: shapely.geometry.base.BaseGeometry,
     _step_size: float,
     minx: float,
     miny: float,
@@ -92,13 +92,16 @@ def create_point_with_restored_coordinates(
 
 
 def linestring_is_within_input_geometry(
-    linestring: LineString, input_geometry: BaseGeometry
+    linestring: LineString, input_geometry: shapely.geometry.base.BaseGeometry
 ) -> bool:
     return linestring.within(input_geometry) and len(linestring.coords[0]) > 1
 
 
 def densify_border(
-    _input_geometry: BaseGeometry, _step_size, minx: float, miny: float
+    _input_geometry: shapely.geometry.base.BaseGeometry,
+    _step_size,
+    minx: float,
+    miny: float,
 ) -> numpy.ndarray:
     polygons = iter_polygons(_input_geometry)
     points = []
@@ -114,7 +117,10 @@ def densify_border(
 
 
 def interpolated_boundary(
-    boundary: BaseGeometry, _step_size: float, minx: float, miny: float
+    boundary: shapely.geometry.base.BaseGeometry,
+    _step_size: float,
+    minx: float,
+    miny: float,
 ) -> List[Tuple[float, float]]:
     line = LineString(boundary)
 

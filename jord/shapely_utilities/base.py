@@ -1,8 +1,8 @@
 import logging
 from typing import Any, Mapping, Optional
 
+import shapely.geometry
 from shapely import LineString, Point
-from shapely.geometry.base import BaseGeometry
 
 from .morphology import clean_shape, closing, opening, zero_buffer
 
@@ -17,7 +17,9 @@ logger = logging.getLogger(__name__)
 DEFAULT_DISTANCE = 1e-7
 
 
-def deflimmer(geom: BaseGeometry, eps: float = DEFAULT_DISTANCE) -> BaseGeometry:
+def deflimmer(
+    geom: shapely.geometry.base.BaseGeometry, eps: float = DEFAULT_DISTANCE
+) -> shapely.geometry.base.BaseGeometry:
     """
 
     :param geom:
@@ -31,10 +33,10 @@ clean_geometry = unflimmer = deflimmer
 
 
 def sanitise(
-    geom: BaseGeometry,
+    geom: shapely.geometry.base.BaseGeometry,
     *args: callable,
     kwargs: Optional[Mapping[callable, Mapping[str, Any]]] = None
-) -> BaseGeometry:
+) -> shapely.geometry.base.BaseGeometry:
     """
       #A positive distance produces a dilation, a negative distance an erosion. A very small or zero distance
       may sometimes be used to “tidy” a polygon.

@@ -6,10 +6,9 @@ from itertools import tee
 from typing import Any, Iterable, List, Mapping, Optional, Tuple, Union
 
 import numpy
-import shapely.geometry.base
+import shapely.geometry
 import tqdm
 from pandas import DataFrame
-from shapely.geometry.base import BaseGeometry
 from warg import Number, ensure_existence, passes_kws_to
 
 from jord import PROJECT_APP_PATH
@@ -247,7 +246,7 @@ def add_wkt_layer(
 
 @passes_kws_to(add_wkb)
 def add_shapely_geometry(
-    qgis_instance_handle: Any, geom: BaseGeometry, *args, **kwargs
+    qgis_instance_handle: Any, geom: shapely.geometry.base.BaseGeometry, *args, **kwargs
 ) -> List:
     """
     Add a shapely geometry
