@@ -1,1 +1,2 @@
 networkx
+osmnx>=2.0.5

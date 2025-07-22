@@ -1,14 +1,19 @@
 from typing import Any, Mapping
 
+import osmnx
 import shapely
+from draugr.numpy_utilities import positive_int_hash
 from networkx import MultiDiGraph, MultiGraph
 
 __all__ = [
     "assertive_add_edge",
-    "add_shapely_node",
     "IllegalLoopException",
     "IllegalDuplicateEdgeException",
 ]
+
+from warg import ensure_existence, recursive_flatten
+
+from jord import PROJECT_APP_PATH
 
 
 class IllegalLoopException(Exception): ...
@@ -21,7 +26,7 @@ def assertive_add_edge(
     graph: MultiGraph,
     u: int,
     v: int,
-    uniqueid: int,
+    key: int,
     attributes: Mapping[str, Any],
     *,
     allow_loops: bool = True,
@@ -35,8 +40,8 @@ def assertive_add_edge(
     :type u: int
     :param v: to node id
     :type v: int
-    :param uniqueid: id of edge
-    :type uniqueid: int
+    :param key: id of edge
+    :type key: int
     :param attributes: attributes of edge
     :type attributes: Mapping[str, Any]
     :param allow_loops: Allow loops
@@ -55,18 +60,21 @@ def assertive_add_edge(
     assert graph.has_node(u)
     assert graph.has_node(v)
 
-    if not allow_duplicates and graph.has_edge(u, v, uniqueid):
-        if graph.has_edge(u, v, uniqueid):
+    if not allow_duplicates and graph.has_edge(u, v, key):
+        if graph.has_edge(u, v, key):
             raise IllegalDuplicateEdgeException(
-                f"Graph already contains the edge ({u} -> {v}) with {uniqueid=}"
+                f"Graph already contains the edge ({u} -> {v}) with {key=}"
             )
 
-    graph.add_edge(u, v, key=uniqueid, uniqueid=uniqueid, **attributes)
+    graph.add_edge(u, v, key=key, **attributes)
 
 
-def add_shapely_node(graph: MultiGraph, u: int, point: shapely.Point, **kwargs) -> None:
+def assertive_add_shapely_node(
+    graph: MultiDiGraph, u: int, point: shapely.Point, **kwargs
+) -> None:
     """
     Add a shapely point based node to the graph.
+
 
     :param graph: The Graph
     :type graph: MultiDiGraph
@@ -83,5 +91,27 @@ def add_shapely_node(graph: MultiGraph, u: int, point: shapely.Point, **kwargs) 
         u,
         x=float(point.x),
         y=float(point.y),
+        id=u,
         **kwargs,
+    )
+
+
+def network_to_osm_xml(network: MultiDiGraph) -> bytes:
+    osm_cache_path = ensure_existence(PROJECT_APP_PATH.site_cache) / "to_upload.osm"
+
+    edge_tags = set(recursive_flatten([edge.keys() for edge in network.edges.values()]))
+    node_tags = set(recursive_flatten([node.keys() for node in network.nodes.values()]))
+
+    osmnx.settings.useful_tags_way = edge_tags
+    osmnx.settings.useful_tags_node = node_tags
+
+    osmnx.save_graph_xml(G=network, filepath=osm_cache_path)
+
+    with open(osm_cache_path, "rb") as f:
+        return f.read()
+
+
+def compute_node_id(point: shapely.geometry.Point) -> int:
+    return positive_int_hash(
+        ",".join(str(c) for c in (point.x, point.y, point.z if point.has_z else None))
     )
