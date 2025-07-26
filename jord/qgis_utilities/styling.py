@@ -11,7 +11,6 @@ from qgis.PyQt.QtCore import QSizeF
 from qgis.PyQt.QtGui import QColor
 
 # noinspection PyUnresolvedReferences
-# noinspection PyUnresolvedReferences
 from qgis.core import (
     QgsCategorizedSymbolRenderer,
     QgsLineSymbol,
