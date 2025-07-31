@@ -9,6 +9,9 @@ __all__ = [
     "assertive_add_edge",
     "IllegalLoopException",
     "IllegalDuplicateEdgeException",
+    "assertive_add_shapely_node",
+    "network_to_osm_xml",
+    "compute_node_id",
 ]
 
 from warg import ensure_existence, recursive_flatten

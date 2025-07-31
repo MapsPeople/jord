@@ -13,6 +13,13 @@ from qgis.core import (
     QgsMapLayer,
 )
 
+from jord.qgis_utilities.helpers.widgets import (
+    CHECKBOX_WIDGET,
+    NULLABLE_CHECKBOX_WIDGET,
+    UNIQUE_VALUES_WIDGET,
+)
+
+
 __all__ = [
     "set_field_widget",
     "make_field_unique",
@@ -25,16 +32,10 @@ __all__ = [
     "make_iterable_dropdown_widget",
     "make_sorted_mapping_dropdown_widget",
     "make_value_map_widget",
-    "field_to_datetime",
-    "field_readonly",
+    "make_field_datetime",
+    "make_field_readonly",
     "make_external_resource_widget",
 ]
-
-from jord.qgis_utilities.helpers.widgets import (
-    CHECKBOX_WIDGET,
-    NULLABLE_CHECKBOX_WIDGET,
-    UNIQUE_VALUES_WIDGET,
-)
 
 
 class DocumentViewerEnum(IntEnum):
@@ -45,10 +46,10 @@ class DocumentViewerEnum(IntEnum):
     web_view = 4
 
 
-AUTO = 0
+AUTO_DIMENSION = 0
 
-ABSOLUTE = 0
-RELATIVE = 1
+ABSOLUTE_PATH = 0
+RELATIVE_PATH = 1
 
 FILE_PATHS = 0
 DIRECTORY_PATHS = 1
@@ -508,7 +509,7 @@ def make_value_relation_widget(
     )
 
 
-def field_to_datetime(layer: Any, field_name: str) -> None:
+def make_field_datetime(layer: Any, field_name: str) -> None:
     """
 
     :param layer:
@@ -531,7 +532,7 @@ def field_to_datetime(layer: Any, field_name: str) -> None:
     layer.setDefaultValueDefinition(field_idx, QgsDefaultValue("now()"))
 
 
-def field_readonly(layer: Any, field_name: str, option: bool = True) -> None:
+def make_field_readonly(layer: Any, field_name: str, option: bool = True) -> None:
     """
 
     :param layer:
@@ -552,8 +553,8 @@ def field_readonly(layer: Any, field_name: str, option: bool = True) -> None:
 
 def make_external_resource_widget(
     document_viewer: DocumentViewerEnum = DocumentViewerEnum.image,
-    document_viewer_width: int = AUTO,
-    document_viewer_height: int = AUTO,
+    document_viewer_width: int = AUTO_DIMENSION,
+    document_viewer_height: int = AUTO_DIMENSION,
 ) -> Any:
     """
 
@@ -595,7 +596,7 @@ def make_external_resource_widget(
             "DocumentViewer": document_viewer.value,
             "DocumentViewerHeight": document_viewer_height,
             "DocumentViewerWidth": document_viewer_width,
-            "RelativeStorage": ABSOLUTE,
+            "RelativeStorage": ABSOLUTE_PATH,
             "StorageMode": FILE_PATHS,
         },
     )
