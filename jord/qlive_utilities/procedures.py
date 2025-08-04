@@ -283,6 +283,7 @@ def add_shapely_layer(
     qgis_instance_handle: Any,
     geoms: Iterable[shapely.geometry.base.BaseGeometry],
     *args,
+    output_dimension=2,
     **kwargs,
 ) -> List:
     # assert geoms[0] == #TODO: SAME TYPE
@@ -290,7 +291,7 @@ def add_shapely_layer(
         geoms = [geoms]
 
     return add_wkb_layer(
-        qgis_instance_handle, [geom.wkb for geom in geoms], *args, **kwargs
+        qgis_instance_handle, [shapely.to_wkb(geom, output_dimension=output_dimension) for geom in geoms], *args, **kwargs
     )
 
 
@@ -300,6 +301,7 @@ def add_dataframe(
     dataframe: DataFrame,
     geometry_column: str = "geometry",
     *args,
+    output_dimension:int=2,
     **kwargs,
 ) -> List:
     """
@@ -318,16 +320,16 @@ def add_dataframe(
         geom_dict = split_on_geom_type(dataframe)
         for df in geom_dict.values():
             if False:
-                for w in df.geometry.to_wkb():  # .to_wkt(rounding_precision=-1):
+                for w in df.geometry.to_wkb(output_dimension=output_dimension):  # .to_wkt(rounding_precision=-1):
                     return_list.append(
                         add_wkb(qgis_instance_handle, w, *args, **kwargs)
                     )
             else:
                 for columns, w in zip(
-                    df.iterrows(), df.geometry.to_wkb()
+                    df.iterrows(), df.geometry.to_wkb(output_dimension=output_dimension)
                 ):  # TODO: ITERROWS may not work
                     return_list.append(
-                        add_wkb(qgis_instance_handle, w, columns, *args, **kwargs)
+                        add_wkb(qgis_instance_handle, w, columns, *args,output_dimension=output_dimension, **kwargs)
                     )
 
     elif isinstance(dataframe, DataFrame):
@@ -347,7 +349,7 @@ def add_dataframe(
             raise NotImplemented
 
         for row in wkts:
-            return_list.append(add_wkb(qgis_instance_handle, row, *args, **kwargs))
+            return_list.append(add_wkb(qgis_instance_handle, row, *args, output_dimension=output_dimension, **kwargs))
     else:
         raise NotImplemented
 
@@ -375,6 +377,7 @@ def add_dataframe_layer(
     name: str = None,
     geometry_column="geometry",
     *args,
+    output_dimension:int=2,
     **kwargs,
 ) -> List:
     from geopandas import GeoDataFrame
@@ -407,7 +410,7 @@ def add_dataframe_layer(
             # logger.info(f"{name=} has {len(df.geometry)} {k.value} geometries")
 
             for (i, c), w in zip(
-                df.iterrows(), df.geometry.to_wkb()  # .to_wkt(rounding_precision=-1)
+                df.iterrows(), df.geometry.to_wkb(output_dimension=output_dimension)  # .to_wkt(rounding_precision=-1)
             ):
                 c.pop(geometry_column)
                 geoms.append(w)
@@ -423,9 +426,10 @@ def add_dataframe_layer(
                 added_layers = add_wkb_layer(
                     qgis_instance_handle,
                     geoms,
+                    *args,
                     name=layer_name,
                     columns=columns,
-                    *args,
+
                     **kwargs,
                 )
 
@@ -442,7 +446,7 @@ def add_dataframe_layer(
             geoms = []
             columns = []
             for (i, c), w in zip(
-                df.iterrows(), df.geometry.to_wkb()  # .to_wkt(rounding_precision=-1)
+                df.iterrows(), df.geometry.to_wkb(output_dimension=output_dimension)  # .to_wkt(rounding_precision=-1)
             ):
                 c.pop(geometry_column)
                 geoms.append(w)
@@ -450,7 +454,7 @@ def add_dataframe_layer(
 
             return_list.append(
                 add_wkb_layer(
-                    qgis_instance_handle, geoms, columns=columns, *args, **kwargs
+                    qgis_instance_handle, geoms,  *args,  columns=columns, **kwargs
                 )
             )
 
@@ -509,8 +513,9 @@ def add_geojsons(
             add_shapely_geometry(
                 qgis_instance_handle,
                 shapely.from_geojson(geojson_),
-                name=layer_name,
+
                 *args,
+                name=layer_name,
                 **kwargs,
             )
         )

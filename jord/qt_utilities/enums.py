@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import Enum, IntEnum
 from typing import Any
 
 __all__ = [
@@ -19,139 +19,53 @@ __all__ = [
     # "AlignmentFlag",
 ]
 
+# Try to import Qt from PyQt6, PyQt5, or QGIS PyQt
 try:
     from PyQt6.QtCore import Qt
-
-    class AlignmentFlag(Enum):
-        """
-        Alignment
-        """
-
-        left = Qt.AlignmentFlag.AlignLeft
-        right = Qt.AlignmentFlag.AlignRight
-        bottom = Qt.AlignmentFlag.AlignBottom
-        top = Qt.AlignmentFlag.AlignTop
-        center = Qt.AlignmentFlag.AlignCenter
-        horizontal_center = Qt.AlignmentFlag.AlignHCenter
-        vertical_center = Qt.AlignmentFlag.AlignVCenter
-
-    class WindowModalityEnum(Enum):
-        """
-
-        PySide2.QtCore.Qt.WindowModality¶
-        This enum specifies the behavior of a modal window. A modal window is one that blocks input to other
-        windows. Note that windows that are children of a modal window are not blocked.
-
-        The values are:
-
-        Constant
-
-        Description
-
-        Qt.NonModal
-
-        The window is not modal and does not block input to other windows.
-
-        Qt.WindowModal
-
-        The window is modal to a single window hierarchy and blocks input to its parent window, all grandparent
-        windows, and all siblings of its parent and grandparent windows.
-
-        Qt.ApplicationModal
-
-        The window is modal to the application and blocks input to all windows."""
-
-        non_modal = Qt.WindowModality.NonModal
-        application = Qt.WindowModality.ApplicationModal
-        window = Qt.WindowModality.WindowModal
-
-    class DockWidgetAreaFlag(Enum):
-        left = (
-            Qt.DockWidgetArea.LeftDockWidgetArea
-        )  # 0x1	The left dock area of a QMainWindow.
-        right = (
-            Qt.DockWidgetArea.RightDockWidgetArea
-        )  # 0x2	The right dock area of a QMainWindow.
-        top = (
-            Qt.DockWidgetArea.TopDockWidgetArea
-        )  # 0x4	The top dock area of a QMainWindow.
-        bottom = (
-            Qt.DockWidgetArea.BottomDockWidgetArea
-        )  # 0x8	The bottom dock area of a QMainWindow.
-        all = (
-            Qt.DockWidgetArea.AllDockWidgetAreas
-        )  # DockWidgetArea_Mask	All dock widget areas (default).
-        none = Qt.DockWidgetArea.NoDockWidgetArea  # 0	No dock widget areas.
-
-    class CheckStateEnum(Enum):
-        unchecked = Qt.CheckState.Unchecked
-        partial = Qt.CheckState.PartiallyChecked
-        checked = Qt.CheckState.Checked
-
-except:
+    _qt_ver = 6
+except ImportError:
     try:
         from PyQt5.QtCore import Qt
-    except:
-        # noinspection PyUnresolvedReferences
+        _qt_ver = 5
+    except ImportError:
         from qgis.PyQt.QtCore import Qt
+        _qt_ver = 0
 
-    class AlignmentFlag(Enum):
-        """
-        Alignment
-        """
+# AlignmentFlag and other flag enums as IntEnum for all Qt versions
+class AlignmentFlag(IntEnum):
+  left = int(getattr(Qt, "AlignmentFlag", Qt).AlignLeft) if _qt_ver == 6 else int(Qt.AlignLeft)
+  right = int(getattr(Qt, "AlignmentFlag", Qt).AlignRight) if _qt_ver == 6 else int(Qt.AlignRight)
+  bottom = int(getattr(Qt, "AlignmentFlag", Qt).AlignBottom) if _qt_ver == 6 else int(Qt.AlignBottom)
+  top = int(getattr(Qt, "AlignmentFlag", Qt).AlignTop) if _qt_ver == 6 else int(Qt.AlignTop)
+  center = int(getattr(Qt, "AlignmentFlag", Qt).AlignCenter) if _qt_ver == 6 else int(Qt.AlignCenter)
+  horizontal_center = int(getattr(Qt, "AlignmentFlag", Qt).AlignHCenter) if _qt_ver == 6 else int(
+    Qt.AlignHCenter
+    )
+  vertical_center = int(getattr(Qt, "AlignmentFlag", Qt).AlignVCenter) if _qt_ver == 6 else int(
+    Qt.AlignVCenter
+    )
 
-        left = Qt.AlignLeft
-        right = Qt.AlignRight
-        bottom = Qt.AlignBottom
-        top = Qt.AlignTop
-        center = Qt.AlignCenter
-        horizontal_center = Qt.AlignHCenter
-        vertical_center = Qt.AlignVCenter
 
-    class WindowModalityEnum(Enum):
-        """
+class WindowModalityEnum(IntEnum):
+        non_modal = int(Qt.WindowModality.NonModal) if _qt_ver == 6 else int(Qt.NonModal)
+        application = int(Qt.WindowModality.ApplicationModal) if _qt_ver == 6 else int(Qt.ApplicationModal)
+        window = int(Qt.WindowModality.WindowModal) if _qt_ver == 6 else int(Qt.WindowModal)
 
-        PySide2.QtCore.Qt.WindowModality¶
-        This enum specifies the behavior of a modal window. A modal window is one that blocks input to other
-        windows. Note that windows that are children of a modal window are not blocked.
 
-        The values are:
+class DockWidgetAreaFlag(IntEnum):
+    left = int(Qt.DockWidgetArea.LeftDockWidgetArea) if _qt_ver == 6 else int(Qt.LeftDockWidgetArea)
+    right = int(Qt.DockWidgetArea.RightDockWidgetArea) if _qt_ver == 6 else int(Qt.RightDockWidgetArea)
+    top = int(Qt.DockWidgetArea.TopDockWidgetArea) if _qt_ver == 6 else int(Qt.TopDockWidgetArea)
+    bottom = int(Qt.DockWidgetArea.BottomDockWidgetArea) if _qt_ver == 6 else int(Qt.BottomDockWidgetArea)
+    all = int(Qt.DockWidgetArea.AllDockWidgetAreas) if _qt_ver == 6 else int(Qt.AllDockWidgetAreas)
+    none = int(Qt.DockWidgetArea.NoDockWidgetArea) if _qt_ver == 6 else int(Qt.NoDockWidgetArea)
+    
 
-        Constant
+class CheckStateEnum(IntEnum):
+    unchecked = int(Qt.CheckState.Unchecked) if _qt_ver == 6 else int(Qt.Unchecked)
+    partial = int(Qt.CheckState.PartiallyChecked) if _qt_ver == 6 else int(Qt.PartiallyChecked)
+    checked = int(Qt.CheckState.Checked) if _qt_ver == 6 else int(Qt.Checked)
 
-        Description
-
-        Qt.NonModal
-
-        The window is not modal and does not block input to other windows.
-
-        Qt.WindowModal
-
-        The window is modal to a single window hierarchy and blocks input to its parent window, all grandparent
-        windows, and all siblings of its parent and grandparent windows.
-
-        Qt.ApplicationModal
-
-        The window is modal to the application and blocks input to all windows."""
-
-        non_modal = Qt.NonModal
-        application = Qt.ApplicationModal
-        window = Qt.WindowModal
-
-    class DockWidgetAreaFlag(Enum):
-        left = Qt.LeftDockWidgetArea  # 0x1	The left dock area of a QMainWindow.
-        right = Qt.RightDockWidgetArea  # 0x2	The right dock area of a QMainWindow.
-        top = Qt.TopDockWidgetArea  # 0x4	The top dock area of a QMainWindow.
-        bottom = Qt.BottomDockWidgetArea  # 0x8	The bottom dock area of a QMainWindow.
-        all = (
-            Qt.AllDockWidgetAreas
-        )  # DockWidgetArea_Mask	All dock widget areas (default).
-        none = Qt.NoDockWidgetArea  # 0	No dock widget areas.
-
-    class CheckStateEnum(Enum):
-        unchecked = Qt.Unchecked
-        partial = Qt.PartiallyChecked
-        checked = Qt.Checked
 
 
 INT_TO_CHECK_STATE = {
