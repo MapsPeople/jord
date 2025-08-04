@@ -244,8 +244,16 @@ def to_string_if_not_of_exact_type(
                 yield v
         elif pandas.isna(v):
             yield None
+        elif isinstance(v, datetime.datetime):
+
+            yield v.isoformat()  # pandas.to_datetime(v)
+
         elif all([type(v) != t for t in type_]):  # UNKNOWN TYPE
-            yield str(v)
+            s = str(v)
+            if False and len(s.strip()) == 0:
+                yield None
+            else:
+                yield s
         else:
             yield v
 

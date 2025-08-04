@@ -503,9 +503,12 @@ def add_qgis_multi_feature_layer(
     if not res:
         logger.error(f"{layer_data_provider.lastError()}")
 
-        assert (
-            res
-        ), f"Failure while adding features {res} {layer_data_provider.lastError()}"
+        if not res:
+            msg = (
+                f"Failure while adding features {res} {layer_data_provider.lastError()}"
+            )
+            assert res, msg
+            logger.warning(msg)
 
         assert len(list(geoms)) == len(
             out_feats
