@@ -1,8 +1,9 @@
 from typing import Any, Collection, List, Mapping, Optional
 
+import pandas
 from pandas import DataFrame
 
-__all__ = ["df_to_columns", "columns_to_df"]
+__all__ = ["df_to_columns", "columns_to_df", "normalize_na"]
 
 
 def df_to_columns(
@@ -23,3 +24,14 @@ def df_to_columns(
 
 
 def columns_to_df(columns: List[Mapping[str, Any]]) -> DataFrame: ...
+
+
+def normalize_na(d: Any) -> Optional[str]:
+    if pandas.isna(d):
+        return None
+
+    # If needed, implement proper display rule normalization logic here
+    # This could involve parsing the string representation and ensuring
+    # extrusion is either None or properly initialized
+
+    return str(d)
