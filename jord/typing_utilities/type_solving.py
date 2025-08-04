@@ -26,6 +26,7 @@ __all__ = [
     "solve_attribute_uri",
     "solve_field_uri",
     "to_string_if_not_of_exact_type",
+    "to_truth",
 ]
 
 logger = logging.getLogger(__name__)
@@ -128,15 +129,23 @@ def solve_qgis_type(
         else:
             if False:
                 logger.error(f"Could not solve type {type(d)=}, {d.__class__.__name__}")
+    try:
+        if to_truth(numpy.isnan(d)):
+            return None
+    except:
+        ...
 
-    if numpy.isnan(d):
-        return None
+    try:
+        if isinstance(d, NDFrame) and d.size == 0:
+            return None
+    except:
+        ...
 
-    if isinstance(d, NDFrame) and d.size == 0:
-        return None
-
-    if pandas.isna(d):
-        return None
+    try:
+        if to_truth(pandas.isna(d)):
+            return None
+    except:
+        ...
 
     if isinstance(d, bool):
         if False:
@@ -301,3 +310,16 @@ def solve_type_configuration(
         return str(a)
 
     return None
+
+
+def to_truth(a: Any) -> bool:
+    if isinstance(a, Iterable):
+
+        try:
+            if isinstance(a, numpy.ndarray):
+                return a.all()
+        except:
+            ...
+        return all(a)
+
+    return a

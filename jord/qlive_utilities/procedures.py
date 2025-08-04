@@ -840,7 +840,7 @@ def add_no_geom_layer(
 
     features = []
     for row in attr_generator:
-        if row:
+        if row is not None:
             feat = QgsFeature()
             feat.initAttributes(num_cols)
             feat.setAttributes(list(to_string_if_not_of_exact_type(row.values())))
